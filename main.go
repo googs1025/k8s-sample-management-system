@@ -14,7 +14,10 @@ func main() {
 		configs.NewK8sMaps(), //3
 		configs.NewServiceConfig(), //4
 	).
-		Mount("v1",controllers.NewDeploymentCtl()).
+		Mount("v1",
+			controllers.NewDeploymentCtl(),
+			controllers.NewPodCtl(),
+		).
 		Launch()
 
 }
