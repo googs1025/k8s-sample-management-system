@@ -13,11 +13,11 @@ func NewK8sMaps() *K8sMaps {
 	return &K8sMaps{}
 }
 
-func (d *K8sMaps) InitDeploymentMap() *core.DeploymentMap {
+func (k *K8sMaps) InitDeploymentMap() *core.DeploymentMap {
 	return &core.DeploymentMap{}
 }
 
 //初始化 podmap
-func(this *K8sMaps) InitPodMap() *core.PodMap{
+func(k *K8sMaps) InitPodMap() *core.PodMap{
 	return &core.PodMap{}
 }

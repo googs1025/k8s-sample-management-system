@@ -15,6 +15,6 @@ func(k *K8sHandler) DepHandlers() *core.DeploymentHandler{
 }
 
 // pod handler
-func(this *K8sHandler) PodHandlers() *core.PodHandler{
+func(k *K8sHandler) PodHandlers() *core.PodHandler{
 	return &core.PodHandler{}
 }

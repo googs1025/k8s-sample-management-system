@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/gin-gonic/gin v1.6.3
-	github.com/shenyisyn/goft-gin v0.4.5
+	github.com/shenyisyn/goft-gin v0.4.7
 	k8s.io/api v0.20.2
 	k8s.io/apimachinery v0.20.2
 	k8s.io/client-go v0.20.2
