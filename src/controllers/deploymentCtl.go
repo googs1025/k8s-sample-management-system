@@ -30,6 +30,8 @@ func (d *DeploymentCtl) Build(goft *goft.Goft) {
 
 func (d *DeploymentCtl) List(c *gin.Context) goft.Json {
 	namespace := c.DefaultQuery("namespace", "default") // 请求： GET /deployments?namespace=xxxxxxx
+
+	// 配合前端
 	return gin.H{
 		"code": 20000,
 		"data": d.DeploymentService.ListAll(namespace),

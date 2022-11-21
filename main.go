@@ -28,7 +28,7 @@ func cross() gin.HandlerFunc {
 
 func main() {
 
-	goft.Ignite(cross()).Config(
+	server := goft.Ignite(cross()).Config(
 		configs.NewK8sHandler(),  //1
 		configs.NewK8sConfig(), //2
 		configs.NewK8sMaps(), //3
@@ -41,8 +41,12 @@ func main() {
 		).
 		Attach(
 			//middlewares.NewCrosMiddleware(), //跨域中间件
-		).
-		Launch()
+		)
+
+	// 前端布署静态文件。
+	server.Static("/dashboard", "./dist")
+	server.Static("/static", "./dist/static")
+	server.Launch()
 
 }
 
