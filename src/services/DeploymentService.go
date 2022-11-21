@@ -2,14 +2,13 @@ package services
 
 import (
 	"github.com/shenyisyn/goft-gin/goft"
-	"k8s-Management-System/src/core"
 	"k8s-Management-System/src/models"
 	v1 "k8s.io/api/apps/v1"
 )
 
 type DeploymentService struct {
-	DeploymentMap *core.DeploymentMap `inject:"-"`
-	Common		  *CommonService	`inject:"-"`
+	DeploymentMap *DeploymentMap   `inject:"-"`
+	Common		  *CommonService `inject:"-"`
 }
 
 func NewDeploymentService() *DeploymentService {

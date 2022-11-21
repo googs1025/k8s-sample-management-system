@@ -1,11 +1,11 @@
-package core
+package services
 
 import (
 	"fmt"
 	v1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
-	"sync"
 	"reflect"
+	"sync"
 )
 
 // DeploymentMap 使用informer监听资源变化后，事件变化加入map中

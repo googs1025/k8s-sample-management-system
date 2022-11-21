@@ -1,7 +1,7 @@
 package configs
 
 import (
-	"k8s-Management-System/src/core"
+	"k8s-Management-System/src/services"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
@@ -10,8 +10,8 @@ import (
 )
 
 type K8sConfig struct {
-	DepHandler *core.DeploymentHandler `inject:"-"`
-	PodHandler *core.PodHandler `inject:"-"`
+	DepHandler *services.DeploymentHandler `inject:"-"`
+	PodHandler *services.PodHandler        `inject:"-"`
 }
 
 func NewK8sConfig() *K8sConfig {

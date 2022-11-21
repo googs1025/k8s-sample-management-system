@@ -38,14 +38,16 @@ func main() {
 			controllers.NewDeploymentCtl(),
 			controllers.NewPodCtl(),
 			controllers.NewUserCtl(),
+			controllers.NewWsCtl(),
 		).
 		Attach(
 			//middlewares.NewCrosMiddleware(), //跨域中间件
 		)
 
 	// 前端布署静态文件。
-	server.Static("/dashboard", "./dist")
-	server.Static("/static", "./dist/static")
+	//server.Static("/dashboard", "./admin")
+	//server.Static("/static", "./admin/static")
+
 	server.Launch()
 
 }

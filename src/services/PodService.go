@@ -1,10 +1,8 @@
 package services
 
-import "k8s-Management-System/src/core"
-
 //@Service
 type PodService struct {
-	PodMap *core.PodMap `inject:"-"`
+	PodMap *PodMap `inject:"-"`
 }
 
 func NewPodService() *PodService {

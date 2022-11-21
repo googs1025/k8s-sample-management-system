@@ -145,6 +145,8 @@ github.com/googleapis/gax-go/v2 v2.0.4/go.mod h1:0Wqv26UfaUD9n4G6kQubkQ+KchISgw+
 github.com/googleapis/gax-go/v2 v2.0.5/go.mod h1:DWXyrwAJ9X0FpwwEdw+IPEYBICEFu5mhpdKc/us6bOk=
 github.com/googleapis/gnostic v0.4.1 h1:DLJCy1n/vrD4HPjOvYcT8aYQXpPIzoRZONaYwyycI+I=
 github.com/googleapis/gnostic v0.4.1/go.mod h1:LRhVm6pbyptWbWbuZ38d1eyptfvIytN3ir6b65WBswg=
+github.com/gorilla/websocket v1.5.0 h1:PPwGk2jz7EePpoHN/+ClbZu8SPxiqlu12wZP/3sWmnc=
+github.com/gorilla/websocket v1.5.0/go.mod h1:YR8l580nyteQvAITg2hZ9XVh4b55+EU/adAjf1fMHhE=
 github.com/gregjones/httpcache v0.0.0-20180305231024-9cad4c3443a7/go.mod h1:FecbI9+v66THATjSRHfNgh1IVFe/9kFxbXtjV0ctIMA=
 github.com/hashicorp/golang-lru v0.5.0/go.mod h1:/m3WP610KZHVQ1SGc6re/UDhFvYD7pJ4Ao+sR/qLZy8=
 github.com/hashicorp/golang-lru v0.5.1 h1:0hERBMJE1eitiLkihrMvRVBYAkpHzc/J3QdDN+dAcgU=
@@ -207,8 +209,6 @@ github.com/robfig/cron/v3 v3.0.1/go.mod h1:eQICP3HwyT7UooqI/z+Ov+PtYAWygg1TEWWzG
 github.com/rogpeppe/go-internal v1.3.0/go.mod h1:M8bDsm7K2OlrFYOpmOWEs/qY81heoFRclV5y23lUDJ4=
 github.com/shenyisyn/goft-expr v0.3.0 h1:B+n80BTZCvBE+R4wy1EtyvUF6HtXOw2xYffkQ9wu4Io=
 github.com/shenyisyn/goft-expr v0.3.0/go.mod h1:iKC8XLbjdP5Gm/h5aAufw1yk8cz3tEkyjLl6PhCS5hQ=
-github.com/shenyisyn/goft-gin v0.4.5 h1:FA47hJSu/8F72ZnYKrwvtkvzNzQKtRx4PLJD0RGqXWk=
-github.com/shenyisyn/goft-gin v0.4.5/go.mod h1:BjyLbuTjpgJQSiMb5zUV20EbJzu4DrUVI1RlbVrf3po=
 github.com/shenyisyn/goft-gin v0.4.7 h1:O8kYVTutTiQd9ZEkrjeDJZIMyk8KbNtD8Aog7YJ8Rq0=
 github.com/shenyisyn/goft-gin v0.4.7/go.mod h1:BjyLbuTjpgJQSiMb5zUV20EbJzu4DrUVI1RlbVrf3po=
 github.com/shenyisyn/goft-ioc v0.5.4 h1:nWi6L/vKy5uMczAZ3sypMzDuHefcvz4FBq4eKcRIMh4=
