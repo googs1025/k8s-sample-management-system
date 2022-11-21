@@ -44,6 +44,7 @@ func (d *DeploymentService) ListAll(namespace string) (res []*models.Deployment)
 			Images:d.Common.GetImages(*deployment),
 			IsComplete:d.getDeploymentIsComplete(deployment),
 			Message:d.getDeploymentCondition(deployment),
+			CreateTime: deployment.CreationTimestamp.Format("2006-01-02 15:04:05"),
 		})
 
 	}
