@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"k8s-Management-System/src/models"
 	v1 "k8s.io/api/apps/v1"
+	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	"reflect"
+	"sort"
 	"sync"
 )
 
@@ -198,6 +200,10 @@ func (n *NamespaceMap) Get(namespace string) *corev1.Namespace {
 }
 
 func (n *NamespaceMap) ListAll() []*models.NamespaceModel {
+
+	items := convertToMapItems(n.data)
+	sort.Sort(items)
+
 	res := make([]*models.NamespaceModel, 0)
 	n.data.Range(func(key, value any) bool {
 		nsName := &models.NamespaceModel{Name: key.(string)}
@@ -206,4 +212,117 @@ func (n *NamespaceMap) ListAll() []*models.NamespaceModel {
 	})
 
 	return res
+}
+
+// event 事件map 相关
+// EventSet 集合 用来保存事件, 只保存最新的一条
+type EventMap struct {
+	data sync.Map   // [key string] *v1.Event
+	// key=>namespace+"_"+kind+"_"+name 这里的name 不一定是pod ,这样确保唯一
+}
+func(e *EventMap) GetMessage(ns string, kind string, name string) string {
+	key := fmt.Sprintf("%s_%s_%s", ns, kind,name)
+	if v, ok := e.data.Load(key); ok {
+		return v.(*corev1.Event).Message
+	}
+	return ""
+}
+
+
+
+type MapItems []*MapItem
+type MapItem struct {
+	key string
+	value interface{}
+}
+//把sync.map  转为 自定义切片
+func convertToMapItems(m sync.Map) MapItems{
+	items := make(MapItems,0)
+	m.Range(func(key, value interface{}) bool {
+		items = append(items, &MapItem{key:key.(string),value:value})
+		return true
+	})
+	return items
+}
+
+func(m MapItems) Len() int{
+	return len(m)
+}
+func(m MapItems) Less(i, j int) bool{
+	return m[i].key < m[j].key
+}
+func(m MapItems) Swap(i, j int){
+	m[i], m[j] = m[j], m[i]
+}
+
+// JobMap 使用informer监听资源变化后，事件变化加入map中
+type JobMap struct {
+	data sync.Map
+}
+
+func (j *JobMap) Add(job *batchv1.Job) {
+
+	if jobList, ok := j.data.Load(job.Namespace); ok {
+		jobList = append(jobList.([]*batchv1.Job), job)
+		j.data.Store(job.Namespace, jobList)
+	} else {
+		newJobList := make([]*batchv1.Job, 0)
+		newJobList = append(newJobList, job)
+		j.data.Store(job.Namespace, newJobList)
+	}
+
+}
+
+func (j *JobMap) Delete(job *batchv1.Job) {
+
+	if jobList, ok := j.data.Load(job.Namespace); ok {
+		list := jobList.([]*batchv1.Job)
+		for k, needDeleteJob := range list {
+			if job.Name == needDeleteJob.Name {
+				newList := append(list[:k], list[k+1:]...)
+				j.data.Store(job.Namespace, newList)
+				break
+			}
+		}
+	}
+}
+
+func (j *JobMap) Update(job *batchv1.Job) error {
+
+	if jobList, ok := j.data.Load(job.Namespace); ok {
+		list := jobList.([]*batchv1.Job)
+		for k, needUpdateJob := range list {
+			if job.Name == needUpdateJob.Name {
+				list[k] = job
+			}
+		}
+		return nil
+
+	}
+
+	return fmt.Errorf("job-%s update error", job.Name)
+
+}
+
+// ListJobByNamespace 内存中读取jobList
+func (j *JobMap) ListJobByNamespace(namespace string) ([]*batchv1.Job, error) {
+	if jobList, ok := j.data.Load(namespace); ok {
+		return jobList.([]*batchv1.Job), nil
+	}
+
+	return nil, fmt.Errorf("list job error, not found")
+}
+
+// GetJob 内存中读取job
+func (j *JobMap) GetJob(namespace string, jobName string) (*batchv1.Job, error) {
+	if jobList, ok := j.data.Load(namespace); ok {
+		list := jobList.([]*batchv1.Job)
+		for _, jj := range list {
+			if jj.Name == jobName {
+				return jj, nil
+			}
+		}
+	}
+
+	return nil, fmt.Errorf("get job error, not found")
 }

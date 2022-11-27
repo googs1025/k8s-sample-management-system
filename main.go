@@ -37,6 +37,7 @@ func main() {
 		Mount("",
 			controllers.NewDeploymentCtl(),
 			controllers.NewPodCtl(),
+			controllers.NewJobCtl(),
 			controllers.NewNamespaceCtl(),
 			controllers.NewUserCtl(),
 			controllers.NewWsCtl(),

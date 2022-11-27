@@ -39,11 +39,11 @@ func (d *DeploymentService) ListAll(namespace string) (res []*models.Deployment)
 	for _, deployment := range deploymentList {
 		res = append(res, &models.Deployment{
 			Name: deployment.Name,
-			NameSpace:deployment.Namespace,
-			Replicas:[3]int32{deployment.Status.Replicas,deployment.Status.AvailableReplicas,deployment.Status.UnavailableReplicas},
-			Images:d.Common.GetImages(*deployment),
-			IsComplete:d.getDeploymentIsComplete(deployment),
-			Message:d.getDeploymentCondition(deployment),
+			NameSpace: deployment.Namespace,
+			Replicas: [3]int32{deployment.Status.Replicas,deployment.Status.AvailableReplicas,deployment.Status.UnavailableReplicas},
+			Images: d.Common.GetImages(*deployment),
+			IsComplete: d.getDeploymentIsComplete(deployment),
+			Message: d.getDeploymentCondition(deployment),
 			CreateTime: deployment.CreationTimestamp.Format("2006-01-02 15:04:05"),
 		})
 

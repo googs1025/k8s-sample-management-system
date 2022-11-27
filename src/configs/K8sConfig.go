@@ -13,6 +13,8 @@ type K8sConfig struct {
 	DepHandler *services.DeploymentHandler `inject:"-"`
 	PodHandler *services.PodHandler        `inject:"-"`
 	NsHandler  *services.NamespaceHandler  `inject:"-"`
+	EventHandler *services.EventHandler `inject:"-"`
+	JobHandler *services.JobHandler `inject:"-"`
 }
 
 func NewK8sConfig() *K8sConfig {
@@ -43,6 +45,12 @@ func (k *K8sConfig) InitInformer() informers.SharedInformerFactory {
 
 	nsInformer := fact.Core().V1().Namespaces()
 	nsInformer.Informer().AddEventHandler(k.NsHandler)
+
+	eventInformer := fact.Core().V1().Events()
+	eventInformer.Informer().AddEventHandler(k.EventHandler)
+
+	jobInformer := fact.Batch().V1().Jobs()
+	jobInformer.Informer().AddEventHandler(k.JobHandler)
 
 	fact.Start(wait.NeverStop)
 

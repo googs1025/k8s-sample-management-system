@@ -20,3 +20,7 @@ func(*ServiceConfig) DeploymentService() *services.DeploymentService{
 func (*ServiceConfig) PodService() *services.PodService {
 	return services.NewPodService()
 }
+
+func (*ServiceConfig) JobService() *services.JobService {
+	return services.NewJobService()
+}

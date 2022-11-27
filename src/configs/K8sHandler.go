@@ -25,3 +25,12 @@ func(k *K8sHandler) PodHandlers() *services.PodHandler {
 func (k *K8sHandler) NamespaceHandler() *services.NamespaceHandler {
 	return &services.NamespaceHandler{}
 }
+
+// event handler
+func(k *K8sHandler) EventHandlers() *services.EventHandler{
+	return &services.EventHandler{}
+}
+
+func(k *K8sHandler) JobHandlers() *services.JobHandler{
+	return &services.JobHandler{}
+}

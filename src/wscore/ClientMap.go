@@ -27,7 +27,7 @@ func(c *ClientMapStruct) Store(conn *websocket.Conn){
 
 
 //向所有客户端 发送消息--发送deployment列表
-func(c *ClientMapStruct) SendAllDepList(v interface{}){
+func(c *ClientMapStruct) SendAll(v interface{}){
 	c.data.Range(func(key, value interface{}) bool {
 		con:=value.(*WsClient).conn
  			err:=con.WriteJSON(v)
