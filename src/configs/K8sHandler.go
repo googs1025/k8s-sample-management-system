@@ -20,3 +20,8 @@ func(k *K8sHandler) DepHandlers() *services.DeploymentHandler {
 func(k *K8sHandler) PodHandlers() *services.PodHandler {
 	return &services.PodHandler{}
 }
+
+// namespace handler
+func (k *K8sHandler) NamespaceHandler() *services.NamespaceHandler {
+	return &services.NamespaceHandler{}
+}

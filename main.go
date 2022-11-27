@@ -37,11 +37,12 @@ func main() {
 		Mount("",
 			controllers.NewDeploymentCtl(),
 			controllers.NewPodCtl(),
+			controllers.NewNamespaceCtl(),
 			controllers.NewUserCtl(),
 			controllers.NewWsCtl(),
 		).
 		Attach(
-			//middlewares.NewCrosMiddleware(), //跨域中间件
+			//middlewares.NewCrossMiddleware(), //跨域中间件
 		)
 
 	// 前端布署静态文件。

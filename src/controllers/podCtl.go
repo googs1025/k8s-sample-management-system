@@ -15,7 +15,12 @@ func NewPodCtl() *PodCtl {
 }
 
 func(p *PodCtl) List(c *gin.Context) goft.Json{
-	return p.PodService.ListByNamespace("default")
+	namespace := c.DefaultQuery("namespace", "default")
+	return gin.H{
+		"code": 20000,
+		"data": p.PodService.ListByNamespace(namespace),
+	}
+
 }
 
 

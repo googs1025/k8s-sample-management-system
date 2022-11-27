@@ -22,7 +22,7 @@ func (c *CommonService) GetImages(deployment v1.Deployment) string {
 func (c *CommonService) GetImagesByPod(containers []corev1.Container) string {
 	images := containers[0].Image
 	if imagesLen := len(containers); imagesLen > 1 {
-		images += fmt.Sprint("其他%d个镜像", imagesLen-1)
+		images += fmt.Sprintf("其他%d个镜像", imagesLen-1)
 	}
 	return images
 }

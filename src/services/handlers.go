@@ -57,3 +57,22 @@ func(p *PodHandler)	OnDelete(obj interface{}){
 		p.PodMap.Delete(d)
 	}
 }
+
+// namespace 相关的回调
+type NamespaceHandler struct {
+	NamespaceMap *NamespaceMap `inject:"-"`
+}
+
+func (n *NamespaceHandler) OnAdd(obj interface{}) {
+	n.NamespaceMap.Add(obj.(*corev1.Namespace))
+}
+
+func (n *NamespaceHandler) OnUpdate(oldObj, newObj interface{}) {
+	n.NamespaceMap.Add(newObj.(*corev1.Namespace))
+}
+
+func (n *NamespaceHandler) OnDelete(obj interface{}) {
+	if d, ok := obj.(*corev1.Namespace); ok {
+		n.NamespaceMap.Delete(d)
+	}
+}

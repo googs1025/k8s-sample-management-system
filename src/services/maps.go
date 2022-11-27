@@ -2,6 +2,7 @@ package services
 
 import (
 	"fmt"
+	"k8s-Management-System/src/models"
 	v1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"reflect"
@@ -170,4 +171,39 @@ func(p *PodMap) DEBUG_ListByNS(ns string) []*corev1.Pod {
 
 	}
 	return ret
+}
+
+type NamespaceMap struct {
+	data sync.Map
+}
+
+func (n *NamespaceMap) Add(ns *corev1.Namespace) {
+	n.data.Store(ns.Name, ns)
+}
+
+func (n *NamespaceMap) Update(ns *corev1.Namespace) {
+	n.data.Store(ns.Name, ns)
+}
+
+func (n *NamespaceMap) Delete(ns *corev1.Namespace) {
+	n.data.Delete(ns.Name)
+}
+
+func (n *NamespaceMap) Get(namespace string) *corev1.Namespace {
+	if item, ok := n.data.Load(namespace); ok {
+		ns := item.(*corev1.Namespace)
+		return ns
+	}
+	return nil
+}
+
+func (n *NamespaceMap) ListAll() []*models.NamespaceModel {
+	res := make([]*models.NamespaceModel, 0)
+	n.data.Range(func(key, value any) bool {
+		nsName := &models.NamespaceModel{Name: key.(string)}
+		res = append(res, nsName)
+		return true
+	})
+
+	return res
 }
