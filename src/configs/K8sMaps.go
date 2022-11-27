@@ -36,3 +36,8 @@ func(k *K8sMaps) InitEventMap() *services.EventMap {
 func(k *K8sMaps) InitJobMap() *services.JobMap {
 	return &services.JobMap{}
 }
+
+// 初始化 service map
+func(k *K8sMaps) InitServiceMap() *services.ServiceMap {
+	return &services.ServiceMap{}
+}

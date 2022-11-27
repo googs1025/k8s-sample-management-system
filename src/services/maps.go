@@ -326,3 +326,75 @@ func (j *JobMap) GetJob(namespace string, jobName string) (*batchv1.Job, error) 
 
 	return nil, fmt.Errorf("get job error, not found")
 }
+
+// ServiceMap 使用informer监听资源变化后，事件变化加入map中
+type ServiceMap struct {
+	data sync.Map
+}
+
+func (s *ServiceMap) Add(service *corev1.Service) {
+
+	if serviceList, ok := s.data.Load(service.Namespace); ok {
+		serviceList = append(serviceList.([]*corev1.Service), service)
+		s.data.Store(service.Namespace, serviceList)
+	} else {
+		newServiceList := make([]*corev1.Service, 0)
+		newServiceList = append(newServiceList, service)
+		s.data.Store(service.Namespace, newServiceList)
+	}
+
+}
+
+func (s *ServiceMap) Delete(service *corev1.Service) {
+
+	if serviceList, ok := s.data.Load(service.Namespace); ok {
+		list := serviceList.([]*corev1.Service)
+		for k, needDeleteService := range list {
+			if service.Name == needDeleteService.Name {
+				newList := append(list[:k], list[k+1:]...)
+				s.data.Store(service.Namespace, newList)
+				break
+			}
+		}
+	}
+}
+
+func (s *ServiceMap) Update(service *corev1.Service) error {
+
+	if serviceList, ok := s.data.Load(service.Namespace); ok {
+		list := serviceList.([]*corev1.Service)
+		for k, needUpdateService := range list {
+			if service.Name == needUpdateService.Name {
+				list[k] = service
+			}
+		}
+		return nil
+
+	}
+
+	return fmt.Errorf("service-%s update error", service.Name)
+
+}
+
+// ListServiceByNamespace 内存中读取serviceList
+func (s *ServiceMap) ListServiceByNamespace(namespace string) ([]*corev1.Service, error) {
+	if serviceList, ok := s.data.Load(namespace); ok {
+		return serviceList.([]*corev1.Service), nil
+	}
+
+	return nil, fmt.Errorf("list service error, not found")
+}
+
+// GetJob 内存中读取job
+func (s *ServiceMap) GetService(namespace string, serviceName string) (*corev1.Service, error) {
+	if serviceList, ok := s.data.Load(namespace); ok {
+		list := serviceList.([]*corev1.Service)
+		for _, service := range list {
+			if service.Name == serviceName {
+				return service, nil
+			}
+		}
+	}
+
+	return nil, fmt.Errorf("get service error, not found")
+}

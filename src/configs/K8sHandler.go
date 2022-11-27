@@ -34,3 +34,7 @@ func(k *K8sHandler) EventHandlers() *services.EventHandler{
 func(k *K8sHandler) JobHandlers() *services.JobHandler{
 	return &services.JobHandler{}
 }
+
+func(k *K8sHandler) ServiceHandlers() *services.ServiceHandler{
+	return &services.ServiceHandler{}
+}

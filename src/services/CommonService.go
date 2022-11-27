@@ -55,3 +55,12 @@ func (c *CommonService) PodIsReady(pod *corev1.Pod) bool {
 
 
 }
+
+func (c *CommonService) ServicePort(servicePort []corev1.ServicePort) []int32 {
+
+	res := make([]int32, 0)
+	for _, s := range servicePort {
+		res = append(res, s.Port)
+	}
+	return res
+}

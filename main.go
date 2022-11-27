@@ -38,6 +38,7 @@ func main() {
 			controllers.NewDeploymentCtl(),
 			controllers.NewPodCtl(),
 			controllers.NewJobCtl(),
+			controllers.NewServiceCtl(),
 			controllers.NewNamespaceCtl(),
 			controllers.NewUserCtl(),
 			controllers.NewWsCtl(),

@@ -22,7 +22,7 @@ func (n *NamespaceCtl) ListAll(c *gin.Context) goft.Json {
 }
 
 func (n *NamespaceCtl) Build(goft *goft.Goft) {
-	goft.Handle("GET", "/nslist", n.ListAll)
+	goft.Handle("GET", "/namespaces", n.ListAll)
 }
 
 func (*NamespaceCtl) Name() string {

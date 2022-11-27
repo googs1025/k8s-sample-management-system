@@ -8,33 +8,33 @@ import (
 )
 
 // job控制器
-type JobCtl struct {
+type ServiceCtl struct {
 	K8sClient kubernetes.Interface `inject:"-"`
-	JobService *services.JobService  `inject:"-"`
+	ServiceService *services.ServiceService  `inject:"-"`
 }
 
-func NewJobCtl() *JobCtl {
-	return &JobCtl{
+func NewServiceCtl() *ServiceCtl {
+	return &ServiceCtl{
 	}
 }
 
 // Name 实现job controller 框架规范
-func (*JobCtl) Name() string {
-	return "JobCtl"
+func (*ServiceCtl) Name() string {
+	return "ServiceCtl"
 }
 
 // Build 实现job controller 路由 框架规范
-func (j *JobCtl) Build(goft *goft.Goft) {
-	goft.Handle("GET", "/jobs", j.List)
+func (s *ServiceCtl) Build(goft *goft.Goft) {
+	goft.Handle("GET", "/services", s.List)
 }
 
-func (j *JobCtl) List(c *gin.Context) goft.Json {
+func (s *ServiceCtl) List(c *gin.Context) goft.Json {
 	namespace := c.DefaultQuery("namespace", "default") // 请求： GET /jobs?namespace=xxxxxxx
 
 	// 配合前端
 	return gin.H{
 		"code": 20000,
-		"data": j.JobService.ListAll(namespace),
+		"data": s.ServiceService.ListServiceByNamespace(namespace),
 	}
 
 }

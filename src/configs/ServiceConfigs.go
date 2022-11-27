@@ -24,3 +24,7 @@ func (*ServiceConfig) PodService() *services.PodService {
 func (*ServiceConfig) JobService() *services.JobService {
 	return services.NewJobService()
 }
+
+func (*ServiceConfig) ServiceService() *services.ServiceService {
+	return services.NewServiceService()
+}

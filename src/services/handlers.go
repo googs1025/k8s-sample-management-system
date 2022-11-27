@@ -202,3 +202,50 @@ func (j *JobHandler) OnUpdate(oldObj, newObj interface{}) {
 		)
 	}
 }
+
+// ServiceHandler 使用informer后 回调的方法
+type ServiceHandler struct {
+	ServiceMap *ServiceMap `inject:"-"`
+	ServiceService *ServiceService `inject:"-"`
+}
+
+func (s *ServiceHandler) OnAdd(obj interface{}) {
+	if ss, ok := obj.(*corev1.Service); ok {
+		s.ServiceMap.Add(ss)
+	}
+	ns := obj.(*corev1.Service).Namespace
+	wscore.ClientMap.SendAll(
+		gin.H{
+			"type":"services",
+			"result":gin.H{"ns":ns,"data":s.ServiceService.ListServiceByNamespace(obj.(*corev1.Service).Namespace)},
+		},
+	)
+}
+
+func (s *ServiceHandler) OnDelete(obj interface{}) {
+	if ss, ok := obj.(*corev1.Service); ok {
+		s.ServiceMap.Delete(ss)
+	}
+	ns := obj.(*corev1.Service).Namespace
+	wscore.ClientMap.SendAll(
+		gin.H{
+			"type":"services",
+			"result":gin.H{"ns": ns,"data":s.ServiceService.ListServiceByNamespace(obj.(*corev1.Service).Namespace)},
+		},
+	)
+}
+
+func (s *ServiceHandler) OnUpdate(oldObj, newObj interface{}) {
+	err := s.ServiceMap.Update(newObj.(*corev1.Service))
+	if err != nil {
+		log.Println(err)
+	} else {
+		ns := newObj.(*corev1.Service).Namespace
+		wscore.ClientMap.SendAll(
+			gin.H{
+				"type":"services",
+				"result":gin.H{"ns":ns,"data":s.ServiceService.ListServiceByNamespace(newObj.(*corev1.Service).Namespace)},
+			},
+		)
+	}
+}
