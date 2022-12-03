@@ -7,8 +7,8 @@ import (
 	v1 "k8s.io/api/apps/v1"
 	batchv1 "k8s.io/api/batch/v1"
 	batchv1beta1 "k8s.io/api/batch/v1beta1"
-	networkingv1 "k8s.io/api/networking/v1"
 	corev1 "k8s.io/api/core/v1"
+	networkingv1 "k8s.io/api/networking/v1beta1"
 	"log"
 )
 
@@ -350,6 +350,7 @@ func (cj *CronJobHandler) OnUpdate(oldObj, newObj interface{}) {
 type IngressHandler struct {
 	IngressMap *IngressMap `inject:"-"`
 }
+
 func(i *IngressHandler) OnAdd(obj interface{}){
 	i.IngressMap.Add(obj.(*networkingv1.Ingress))
 	ns := obj.(*networkingv1.Ingress).Namespace

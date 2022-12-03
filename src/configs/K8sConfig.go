@@ -65,8 +65,9 @@ func (k *K8sConfig) InitInformer() informers.SharedInformerFactory {
 	cronJobInformer := fact.Batch().V1beta1().CronJobs()
 	cronJobInformer.Informer().AddEventHandler(k.CronJobHandler)
 
-	IngressInformer:=fact.Networking().V1().Ingresses() //监听Ingress
+	IngressInformer:=fact.Networking().V1beta1().Ingresses() // 监听 Ingress
 	IngressInformer.Informer().AddEventHandler(k.IngressHandler)
+
 
 
 

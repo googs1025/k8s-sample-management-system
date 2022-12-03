@@ -37,6 +37,10 @@ func (*ServiceConfig) CronJobService() *services.CronJobService {
 	return services.NewCronJobService()
 }
 
+func(*ServiceConfig) IngressService() *services.IngressService{
+	return services.NewIngressService()
+}
+
 //func (*ServiceConfig) CRDService() *services.ServiceService {
 //	return services.NewCRDService()
 //}
