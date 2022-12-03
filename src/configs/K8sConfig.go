@@ -18,6 +18,7 @@ type K8sConfig struct {
 	ServiceHandler *services.ServiceHandler `inject:"-"`
 	StatefulSetHandler *services.StatefulSetHandler `inject:"-"`
 	CronJobHandler *services.CronJobHandler `inject:"-"`
+	IngressHandler *services.IngressHandler `inject:"-"`
 }
 
 func NewK8sConfig() *K8sConfig {
@@ -64,6 +65,8 @@ func (k *K8sConfig) InitInformer() informers.SharedInformerFactory {
 	cronJobInformer := fact.Batch().V1beta1().CronJobs()
 	cronJobInformer.Informer().AddEventHandler(k.CronJobHandler)
 
+	IngressInformer:=fact.Networking().V1().Ingresses() //监听Ingress
+	IngressInformer.Informer().AddEventHandler(k.IngressHandler)
 
 
 

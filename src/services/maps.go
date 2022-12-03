@@ -7,6 +7,7 @@ import (
 	batchv1 "k8s.io/api/batch/v1"
 	batchv1beta1 "k8s.io/api/batch/v1beta1"
 	corev1 "k8s.io/api/core/v1"
+	networkingv1 "k8s.io/api/networking/v1"
 	"reflect"
 	"sort"
 	"sync"
@@ -542,4 +543,69 @@ func (s *CronJobMap) GetCronJob(namespace string, cronJobName string) (*batchv1b
 	}
 
 	return nil, fmt.Errorf("get cronJob error, not found")
+}
+
+type IngressMap struct {
+	data sync.Map   // [ns string] []*v1beta1.Ingress
+}
+//获取单个Ingress
+func(i *IngressMap) Get(namespace string,name string) *networkingv1.Ingress{
+	if items,ok := i.data.Load(namespace);ok{
+		for _, item := range items.([]*networkingv1.Ingress){
+			if item.Name==name{
+				return item
+			}
+		}
+	}
+	return nil
+}
+
+func(i *IngressMap) Add(ingress *networkingv1.Ingress){
+	if list, ok := i.data.Load(ingress.Namespace); ok {
+		list = append(list.([]*networkingv1.Ingress),ingress)
+		i.data.Store(ingress.Namespace, list)
+	} else {
+		i.data.Store(ingress.Namespace, []*networkingv1.Ingress{ingress})
+	}
+}
+
+func(i *IngressMap) Update(ingress *networkingv1.Ingress) error {
+	if list,ok := i.data.Load(ingress.Namespace); ok {
+		for ii, needUpdateIngress := range list.([]*networkingv1.Ingress) {
+			if needUpdateIngress.Name == ingress.Name {
+				list.([]*networkingv1.Ingress)[ii] = ingress
+			}
+		}
+		return nil
+	}
+	return fmt.Errorf("ingress-%s not found",ingress.Name)
+}
+
+func(i *IngressMap) Delete(ingress *networkingv1.Ingress){
+	if list, ok := i.data.Load(ingress.Namespace); ok{
+		for ii, needDeleteIngress:=range list.([]*networkingv1.Ingress){
+			if needDeleteIngress.Name == ingress.Name {
+				newList := append(list.([]*networkingv1.Ingress)[:ii], list.([]*networkingv1.Ingress)[ii+1:]...)
+				i.data.Store(ingress.Namespace, newList)
+				break
+			}
+		}
+	}
+}
+
+func(i *IngressMap) ListAll(ns string)[]*models.IngressModel{
+	if list,ok:=i.data.Load(ns);ok{
+		ingressList:=list.([]*networkingv1.Ingress)
+
+		ret := make([]*models.IngressModel,len(ingressList))
+		for ii, item := range ingressList{
+			ret[ii] = &models.IngressModel{
+				Name: item.Name,
+				CreateTime: item.CreationTimestamp.Format("2006-01-02 15:04:05"),
+				NameSpace: item.Namespace,
+			}
+		}
+		return ret
+	}
+	return []*models.IngressModel{} //返回空列表
 }

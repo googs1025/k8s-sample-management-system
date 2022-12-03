@@ -46,3 +46,8 @@ func(k *K8sHandler) CronJobHandlers() *services.CronJobHandler{
 func(k *K8sHandler) StatefulSetHandlers() *services.StatefulSetHandler{
 	return &services.StatefulSetHandler{}
 }
+
+// IngressHandler
+func(k *K8sHandler) IngressHandler() *services.IngressHandler{
+	return &services.IngressHandler{}
+}

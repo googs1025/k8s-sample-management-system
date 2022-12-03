@@ -44,6 +44,7 @@ func main() {
 			controllers.NewWsCtl(),
 			controllers.NewStatefulSetCtl(),
 			controllers.NewCronJobCtl(),
+			controllers.NewIngressCtl(),
 		).
 		Attach(
 			//middlewares.NewCrossMiddleware(), //跨域中间件

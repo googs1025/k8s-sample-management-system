@@ -52,6 +52,11 @@ func(k *K8sMaps) InitCronJobMap() *services.CronJobMap {
 	return &services.CronJobMap{}
 }
 
+//初始化 ingress map
+func(k *K8sMaps) InitIngressMap() *services.IngressMap{
+	return &services.IngressMap{}
+}
+
 // 初始化 service map
 //func(k *K8sMaps) InitCRDMap() *services.CRDMap {
 //	return &services.CRDMap{}
