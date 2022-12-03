@@ -1,7 +1,7 @@
 ## k8s 资源对象的简易后台管理系统
 ### 项目思路与功能
 功能：预计提供k8s资源的增删改查。
-
+![](https://github.com/googs1025/k8s-sample-management-system/blob/main/images/%E6%B5%81%E7%A8%8B%E5%9B%BE.jpg?raw=true)
 #### 查询功能：
 **workload**
 1. pod
