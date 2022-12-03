@@ -28,3 +28,15 @@ func (*ServiceConfig) JobService() *services.JobService {
 func (*ServiceConfig) ServiceService() *services.ServiceService {
 	return services.NewServiceService()
 }
+
+func (*ServiceConfig) StatefulSetService() *services.StatefulSetService {
+	return services.NewStatefulSetService()
+}
+
+func (*ServiceConfig) CronJobService() *services.CronJobService {
+	return services.NewCronJobService()
+}
+
+//func (*ServiceConfig) CRDService() *services.ServiceService {
+//	return services.NewCRDService()
+//}

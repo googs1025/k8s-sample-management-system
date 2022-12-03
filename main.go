@@ -34,7 +34,7 @@ func main() {
 		configs.NewK8sMaps(), //3
 		configs.NewServiceConfig(), //4
 	).
-		Mount("",
+		Mount("", // TODO: 支持其他更多工作负载资源
 			controllers.NewDeploymentCtl(),
 			controllers.NewPodCtl(),
 			controllers.NewJobCtl(),
@@ -42,6 +42,8 @@ func main() {
 			controllers.NewNamespaceCtl(),
 			controllers.NewUserCtl(),
 			controllers.NewWsCtl(),
+			controllers.NewStatefulSetCtl(),
+			controllers.NewCronJobCtl(),
 		).
 		Attach(
 			//middlewares.NewCrossMiddleware(), //跨域中间件

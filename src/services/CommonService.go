@@ -4,6 +4,7 @@ import (
 	"fmt"
 	v1 "k8s.io/api/apps/v1"
 	batchv1 "k8s.io/api/batch/v1"
+	batchv1beta1 "k8s.io/api/batch/v1beta1"
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -20,8 +21,16 @@ func (c *CommonService) GetImages(deployment v1.Deployment) string {
 	return c.GetImagesByPod(deployment.Spec.Template.Spec.Containers)
 }
 
+func (c *CommonService) GetStatefulSetImages(statefulSet v1.StatefulSet) string {
+	return c.GetImagesByPod(statefulSet.Spec.Template.Spec.Containers)
+}
+
 func (c *CommonService) GetJobImages(job batchv1.Job) string {
 	return c.GetImagesByPod(job.Spec.Template.Spec.Containers)
+}
+
+func (c *CommonService) GetCronJobImages(cronjob batchv1beta1.CronJob) string {
+	return c.GetImagesByPod(cronjob.Spec.JobTemplate.Spec.Template.Spec.Containers)
 }
 
 func (c *CommonService) GetImagesByPod(containers []corev1.Container) string {

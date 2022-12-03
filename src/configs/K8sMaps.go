@@ -41,3 +41,18 @@ func(k *K8sMaps) InitJobMap() *services.JobMap {
 func(k *K8sMaps) InitServiceMap() *services.ServiceMap {
 	return &services.ServiceMap{}
 }
+
+// 初始化 service map
+func(k *K8sMaps) InitStatefulSetMap() *services.StatefulSetMap {
+	return &services.StatefulSetMap{}
+}
+
+// 初始化 service map
+func(k *K8sMaps) InitCronJobMap() *services.CronJobMap {
+	return &services.CronJobMap{}
+}
+
+// 初始化 service map
+//func(k *K8sMaps) InitCRDMap() *services.CRDMap {
+//	return &services.CRDMap{}
+//}

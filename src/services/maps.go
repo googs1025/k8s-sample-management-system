@@ -5,6 +5,7 @@ import (
 	"k8s-Management-System/src/models"
 	v1 "k8s.io/api/apps/v1"
 	batchv1 "k8s.io/api/batch/v1"
+	batchv1beta1 "k8s.io/api/batch/v1beta1"
 	corev1 "k8s.io/api/core/v1"
 	"reflect"
 	"sort"
@@ -385,7 +386,7 @@ func (s *ServiceMap) ListServiceByNamespace(namespace string) ([]*corev1.Service
 	return nil, fmt.Errorf("list service error, not found")
 }
 
-// GetJob 内存中读取job
+// GetService 内存中读取service
 func (s *ServiceMap) GetService(namespace string, serviceName string) (*corev1.Service, error) {
 	if serviceList, ok := s.data.Load(namespace); ok {
 		list := serviceList.([]*corev1.Service)
@@ -397,4 +398,148 @@ func (s *ServiceMap) GetService(namespace string, serviceName string) (*corev1.S
 	}
 
 	return nil, fmt.Errorf("get service error, not found")
+}
+
+// ServiceMap 使用informer监听资源变化后，事件变化加入map中
+type StatefulSetMap struct {
+	data sync.Map
+}
+
+func (s *StatefulSetMap) Add(statefulSet *v1.StatefulSet) {
+
+	if statefulSetList, ok := s.data.Load(statefulSet.Namespace); ok {
+		statefulSetList = append(statefulSetList.([]*v1.StatefulSet), statefulSet)
+		s.data.Store(statefulSet.Namespace, statefulSetList)
+	} else {
+		newStatefulSetList := make([]*v1.StatefulSet, 0)
+		newStatefulSetList = append(newStatefulSetList, statefulSet)
+		s.data.Store(statefulSet.Namespace, newStatefulSetList)
+	}
+
+}
+
+func (s *StatefulSetMap) Delete(statefulSet *v1.StatefulSet) {
+
+	if statefulSetList, ok := s.data.Load(statefulSet.Namespace); ok {
+		list := statefulSetList.([]*v1.StatefulSet)
+		for k, needDeleteStatefulSet := range list {
+			if statefulSet.Name == needDeleteStatefulSet.Name {
+				newList := append(list[:k], list[k+1:]...)
+				s.data.Store(statefulSet.Namespace, newList)
+				break
+			}
+		}
+	}
+}
+
+func (s *StatefulSetMap) Update(statefulSet *v1.StatefulSet) error {
+
+	if statefulSetList, ok := s.data.Load(statefulSet.Namespace); ok {
+		list := statefulSetList.([]*v1.StatefulSet)
+		for k, needUpdateStatefulSet := range list {
+			if statefulSet.Name == needUpdateStatefulSet.Name {
+				list[k] = statefulSet
+			}
+		}
+		return nil
+
+	}
+
+	return fmt.Errorf("statefulSet-%s update error", statefulSet.Name)
+
+}
+
+// ListStatefulSetByNamespace 内存中读取statefulSetList
+func (s *StatefulSetMap) ListStatefulSetByNamespace(namespace string) ([]*v1.StatefulSet, error) {
+	if statefulSetList, ok := s.data.Load(namespace); ok {
+		return statefulSetList.([]*v1.StatefulSet), nil
+	}
+
+	return nil, fmt.Errorf("list statefulSet error, not found")
+}
+
+// GetStatefulSet 内存中读取statefulSet
+func (s *StatefulSetMap) GetStatefulSet(namespace string, statefulSetName string) (*v1.StatefulSet, error) {
+	if statefulSetList, ok := s.data.Load(namespace); ok {
+		list := statefulSetList.([]*v1.StatefulSet)
+		for _, statefulSet := range list {
+			if statefulSet.Name == statefulSetName {
+				return statefulSet, nil
+			}
+		}
+	}
+
+	return nil, fmt.Errorf("get statefulSet error, not found")
+}
+
+// ServiceMap 使用informer监听资源变化后，事件变化加入map中
+type CronJobMap struct {
+	data sync.Map
+}
+
+func (s *CronJobMap) Add(cronJob *batchv1beta1.CronJob) {
+
+	if cronJobList, ok := s.data.Load(cronJob.Namespace); ok {
+		cronJobList = append(cronJobList.([]*batchv1beta1.CronJob), cronJob)
+		s.data.Store(cronJob.Namespace, cronJobList)
+	} else {
+		newCronJobList := make([]*batchv1beta1.CronJob, 0)
+		newCronJobList = append(newCronJobList, cronJob)
+		s.data.Store(cronJob.Namespace, newCronJobList)
+	}
+
+}
+
+func (s *CronJobMap) Delete(cronJob *batchv1beta1.CronJob) {
+
+	if cronJobList, ok := s.data.Load(cronJob.Namespace); ok {
+		list := cronJobList.([]*batchv1beta1.CronJob)
+		for k, needDeleteCronJob := range list {
+			if cronJob.Name == needDeleteCronJob.Name {
+				newList := append(list[:k], list[k+1:]...)
+				s.data.Store(cronJob.Namespace, newList)
+				break
+			}
+		}
+	}
+}
+
+func (s *CronJobMap) Update(cronJob *batchv1beta1.CronJob) error {
+
+	if cronJobList, ok := s.data.Load(cronJob.Namespace); ok {
+		list := cronJobList.([]*batchv1beta1.CronJob)
+		for k, needUpdateCronJob := range list {
+			if cronJob.Name == needUpdateCronJob.Name {
+				list[k] = cronJob
+			}
+		}
+		return nil
+
+	}
+
+	return fmt.Errorf("cronJob-%s update error", cronJob.Name)
+
+}
+
+// ListCronJobByNamespace 内存中读取cronJobList
+func (s *CronJobMap) ListCronJobByNamespace(namespace string) ([]*batchv1beta1.CronJob, error) {
+	if cronJobList, ok := s.data.Load(namespace); ok {
+		return cronJobList.([]*batchv1beta1.CronJob), nil
+	}
+
+	return nil, fmt.Errorf("list cronJob error, not found")
+}
+
+// GetCronJob 内存中读取cronJob
+func (s *CronJobMap) GetCronJob(namespace string, cronJobName string) (*batchv1beta1.CronJob, error) {
+	if cronJobList, ok := s.data.Load(namespace); ok {
+		list := cronJobList.([]*batchv1beta1.CronJob)
+		for _, cronJob := range list {
+			if cronJob.Name == cronJobName {
+				return cronJob, nil
+			}
+		}
+	}
+
+	return nil, fmt.Errorf("get cronJob error, not found")
 }

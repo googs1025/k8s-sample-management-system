@@ -6,6 +6,7 @@ import (
 	"k8s-Management-System/src/wscore"
 	v1 "k8s.io/api/apps/v1"
 	batchv1 "k8s.io/api/batch/v1"
+	batchv1beta1 "k8s.io/api/batch/v1beta1"
 	corev1 "k8s.io/api/core/v1"
 	"log"
 )
@@ -245,6 +246,100 @@ func (s *ServiceHandler) OnUpdate(oldObj, newObj interface{}) {
 			gin.H{
 				"type":"services",
 				"result":gin.H{"ns":ns,"data":s.ServiceService.ListServiceByNamespace(newObj.(*corev1.Service).Namespace)},
+			},
+		)
+	}
+}
+
+// StatefulSetHandler 使用informer后 回调的方法
+type StatefulSetHandler struct {
+	StatefulSetMap *StatefulSetMap `inject:"-"`
+	StatefulSetService *StatefulSetService `inject:"-"`
+}
+
+func (s *StatefulSetHandler) OnAdd(obj interface{}) {
+	if ss, ok := obj.(*v1.StatefulSet); ok {
+		s.StatefulSetMap.Add(ss)
+	}
+	ns := obj.(*v1.StatefulSet).Namespace
+	wscore.ClientMap.SendAll(
+		gin.H{
+			"type":"statefulsets",
+			"result":gin.H{"ns":ns,"data":s.StatefulSetService.ListAll(obj.(*v1.StatefulSet).Namespace)},
+		},
+	)
+}
+
+func (s *StatefulSetHandler) OnDelete(obj interface{}) {
+	if ss, ok := obj.(*v1.StatefulSet); ok {
+		s.StatefulSetMap.Delete(ss)
+	}
+	ns := obj.(*v1.StatefulSet).Namespace
+	wscore.ClientMap.SendAll(
+		gin.H{
+			"type":"statefulsets",
+			"result":gin.H{"ns": ns,"data":s.StatefulSetService.ListAll(obj.(*v1.StatefulSet).Namespace)},
+		},
+	)
+}
+
+func (s *StatefulSetHandler) OnUpdate(oldObj, newObj interface{}) {
+	err := s.StatefulSetMap.Update(newObj.(*v1.StatefulSet))
+	if err != nil {
+		log.Println(err)
+	} else {
+		ns := newObj.(*v1.StatefulSet).Namespace
+		wscore.ClientMap.SendAll(
+			gin.H{
+				"type":"statefulsets",
+				"result":gin.H{"ns":ns,"data":s.StatefulSetService.ListAll(newObj.(*v1.StatefulSet).Namespace)},
+			},
+		)
+	}
+}
+
+// CronJobHandler 使用informer后 回调的方法
+type CronJobHandler struct {
+	CronJobMap *CronJobMap `inject:"-"`
+	CronJobService *CronJobService `inject:"-"`
+}
+
+func (cj *CronJobHandler) OnAdd(obj interface{}) {
+	if ss, ok := obj.(*batchv1beta1.CronJob); ok {
+		cj.CronJobMap.Add(ss)
+	}
+	ns := obj.(*batchv1beta1.CronJob).Namespace
+	wscore.ClientMap.SendAll(
+		gin.H{
+			"type":"cronjobs",
+			"result":gin.H{"ns":ns,"data": cj.CronJobService.ListAll(obj.(*batchv1beta1.CronJob).Namespace)},
+		},
+	)
+}
+
+func (cj *CronJobHandler) OnDelete(obj interface{}) {
+	if ss, ok := obj.(*batchv1beta1.CronJob); ok {
+		cj.CronJobMap.Delete(ss)
+	}
+	ns := obj.(*batchv1beta1.CronJob).Namespace
+	wscore.ClientMap.SendAll(
+		gin.H{
+			"type":"cronjobs",
+			"result":gin.H{"ns": ns,"data": cj.CronJobService.ListAll(obj.(*batchv1beta1.CronJob).Namespace)},
+		},
+	)
+}
+
+func (cj *CronJobHandler) OnUpdate(oldObj, newObj interface{}) {
+	err := cj.CronJobMap.Update(newObj.(*batchv1beta1.CronJob))
+	if err != nil {
+		log.Println(err)
+	} else {
+		ns := newObj.(*batchv1beta1.CronJob).Namespace
+		wscore.ClientMap.SendAll(
+			gin.H{
+				"type":"cronjobs",
+				"result":gin.H{"ns":ns,"data": cj.CronJobService.ListAll(newObj.(*batchv1beta1.CronJob).Namespace)},
 			},
 		)
 	}

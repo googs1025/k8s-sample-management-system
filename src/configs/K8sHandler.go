@@ -38,3 +38,11 @@ func(k *K8sHandler) JobHandlers() *services.JobHandler{
 func(k *K8sHandler) ServiceHandlers() *services.ServiceHandler{
 	return &services.ServiceHandler{}
 }
+
+func(k *K8sHandler) CronJobHandlers() *services.CronJobHandler{
+	return &services.CronJobHandler{}
+}
+
+func(k *K8sHandler) StatefulSetHandlers() *services.StatefulSetHandler{
+	return &services.StatefulSetHandler{}
+}
