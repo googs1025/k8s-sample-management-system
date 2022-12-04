@@ -15,8 +15,10 @@
 
 **服务发现**
 1. service
-
-
+2. ingress
+**配置文件**
+1. configmap
+2. secret
 ### 项目启动
 1. 进入自己的集群输入命令(转发端口)
 ```bigquery
