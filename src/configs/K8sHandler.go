@@ -51,3 +51,8 @@ func(k *K8sHandler) StatefulSetHandlers() *services.StatefulSetHandler{
 func(k *K8sHandler) IngressHandler() *services.IngressHandler{
 	return &services.IngressHandler{}
 }
+
+// SecretHandler
+func(k *K8sHandler) SecretHandler() *services.SecretHandler{
+	return &services.SecretHandler{}
+}

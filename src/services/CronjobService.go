@@ -37,7 +37,7 @@ func (cj *CronJobService) ListAll(namespace string) (res []*models.CronJob) {
 			Name: cjj.Name,
 			NameSpace: cjj.Namespace,
 			Images: cj.Common.GetCronJobImages(*cjj),
-			LastScheduleTime: cj.getCronJobLastScheduleTime(cjj),
+			LastScheduleTime: cj.getCronJobLastScheduleTime(cjj).Format("2006-01-02 15:04:05"),
 			CreateTime: cjj.CreationTimestamp.Format("2006-01-02 15:04:05"),
 		})
 

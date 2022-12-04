@@ -389,3 +389,46 @@ func(i *IngressHandler) OnDelete(obj interface{}){
 		},
 	)
 }
+
+//Secret相关的handler
+type SecretHandler struct {
+	SecretMap *SecretMap  `inject:"-"`
+	SecretService *SecretService  `inject:"-"`
+}
+func(s *SecretHandler) OnAdd(obj interface{}){
+	s.SecretMap.Add(obj.(*corev1.Secret))
+	ns:=obj.(*corev1.Secret).Namespace
+	wscore.ClientMap.SendAll(
+		gin.H{
+			"type":"secret",
+			"result":gin.H{"ns": ns,
+				"data": s.SecretService.ListSecretByNamespace(ns)},
+		},
+	)
+}
+func(s *SecretHandler) OnUpdate(oldObj, newObj interface{}){
+	err:=s.SecretMap.Update(newObj.(*corev1.Secret))
+	if err!=nil{
+		log.Println(err)
+		return
+	}
+	ns:=newObj.(*corev1.Secret).Namespace
+	wscore.ClientMap.SendAll(
+		gin.H{
+			"type":"secret",
+			"result":gin.H{"ns": ns,
+				"data": s.SecretService.ListSecretByNamespace(ns)},
+		},
+	)
+}
+func(s *SecretHandler) OnDelete(obj interface{}){
+	s.SecretMap.Delete(obj.(*corev1.Secret))
+	ns:=obj.(*corev1.Secret).Namespace
+	wscore.ClientMap.SendAll(
+		gin.H{
+			"type":"secret",
+			"result":gin.H{"ns": ns,
+				"data": s.SecretService.ListSecretByNamespace(ns)},
+		},
+	)
+}

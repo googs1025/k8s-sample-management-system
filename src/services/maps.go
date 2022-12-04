@@ -609,3 +609,61 @@ func(i *IngressMap) ListAll(ns string)[]*models.IngressModel{
 	}
 	return []*models.IngressModel{} //返回空列表
 }
+
+//SecretMap
+type SecretMap struct {
+	data sync.Map   // [ns string] []*v1.Secret
+}
+
+func(s *SecretMap) Get(namespace string, name string) *corev1.Secret{
+	if items, ok := s.data.Load(namespace); ok {
+		for _, item := range items.([]*corev1.Secret) {
+			if item.Name == name {
+				return item
+			}
+		}
+	}
+	return nil
+}
+
+func(s *SecretMap) Add(item *corev1.Secret) {
+	if list, ok := s.data.Load(item.Namespace); ok {
+		list = append(list.([]*corev1.Secret), item)
+		s.data.Store(item.Namespace, list)
+	} else {
+		s.data.Store(item.Namespace, []*corev1.Secret{item})
+	}
+}
+
+func(s *SecretMap) Update(item *corev1.Secret) error {
+	if list, ok := s.data.Load(item.Namespace); ok {
+		for i,needUpdateSecret := range list.([]*corev1.Secret){
+			if needUpdateSecret.Name == item.Name {
+				list.([]*corev1.Secret)[i] = item
+			}
+		}
+		return nil
+	}
+	return fmt.Errorf("secret-%s not found",item.Name)
+}
+
+func(s *SecretMap) Delete(item *corev1.Secret){
+	if list, ok := s.data.Load(item.Namespace); ok {
+		for i,needDeleteSecret:=range list.([]*corev1.Secret){
+			if needDeleteSecret.Name == item.Name {
+				newList := append(list.([]*corev1.Secret)[:i], list.([]*corev1.Secret)[i+1:]...)
+				s.data.Store(item.Namespace, newList)
+				break
+			}
+		}
+	}
+}
+
+func(s *SecretMap) ListAll(namespace string) []*corev1.Secret {
+	if list,ok:=s.data.Load(namespace);ok{
+		newList:=list.([]*corev1.Secret)
+
+		return newList
+	}
+	return []*corev1.Secret{} //返回空列表
+}

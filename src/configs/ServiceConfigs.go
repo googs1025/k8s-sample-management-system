@@ -41,6 +41,10 @@ func(*ServiceConfig) IngressService() *services.IngressService{
 	return services.NewIngressService()
 }
 
+func(*ServiceConfig) SecretService() *services.SecretService{
+	return services.NewSecretService()
+}
+
 //func (*ServiceConfig) CRDService() *services.ServiceService {
 //	return services.NewCRDService()
 //}

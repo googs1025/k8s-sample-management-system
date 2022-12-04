@@ -19,6 +19,7 @@ type K8sConfig struct {
 	StatefulSetHandler *services.StatefulSetHandler `inject:"-"`
 	CronJobHandler *services.CronJobHandler `inject:"-"`
 	IngressHandler *services.IngressHandler `inject:"-"`
+	SecretHandler *services.SecretHandler `inject:"-"`
 }
 
 func NewK8sConfig() *K8sConfig {
@@ -68,6 +69,8 @@ func (k *K8sConfig) InitInformer() informers.SharedInformerFactory {
 	IngressInformer:=fact.Networking().V1beta1().Ingresses() // 监听 Ingress
 	IngressInformer.Informer().AddEventHandler(k.IngressHandler)
 
+	SecretInformer := fact.Core().V1().Secrets() //监听Secret
+	SecretInformer.Informer().AddEventHandler(k.SecretHandler)
 
 
 

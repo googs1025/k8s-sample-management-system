@@ -45,6 +45,7 @@ func main() {
 			controllers.NewStatefulSetCtl(),
 			controllers.NewCronJobCtl(),
 			controllers.NewIngressCtl(),
+			controllers.NewSecretCtl(),
 		).
 		Attach(
 			//middlewares.NewCrossMiddleware(), //跨域中间件
