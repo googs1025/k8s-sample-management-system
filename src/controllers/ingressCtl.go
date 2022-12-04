@@ -36,7 +36,7 @@ func(i *IngressCtl) PostIngress(c *gin.Context) goft.Json {
 	goft.Error(c.BindJSON(postModel))
 	goft.Error(i.IngressService.PostIngress(postModel))
 	return gin.H {
-		"code":20000,
+		"code": 20000,
 		"data": postModel,
 	}
 }

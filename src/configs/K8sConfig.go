@@ -70,10 +70,10 @@ func (k *K8sConfig) InitInformer() informers.SharedInformerFactory {
 	IngressInformer:=fact.Networking().V1beta1().Ingresses() // 监听 Ingress
 	IngressInformer.Informer().AddEventHandler(k.IngressHandler)
 
-	SecretInformer := fact.Core().V1().Secrets() //监听Secret
+	SecretInformer := fact.Core().V1().Secrets() //监听 Secret
 	SecretInformer.Informer().AddEventHandler(k.SecretHandler)
 
-	ConfigMapInformer := fact.Core().V1().ConfigMaps() //监听Configmap
+	ConfigMapInformer := fact.Core().V1().ConfigMaps() //监听 Configmap
 	ConfigMapInformer.Informer().AddEventHandler(k.ConfigMapHandler)
 
 

@@ -16,11 +16,11 @@ func NewWsCtl() *WsCtl {
 }
 
 func(w *WsCtl) Connect(c *gin.Context) string    {
-	client,err:=wscore.Upgrader.Upgrade(c.Writer,c.Request,nil)  //升级
-	if err!=nil{
+	client, err := wscore.Upgrader.Upgrade(c.Writer,c.Request,nil)  //升级
+	if err != nil {
 		log.Println(err)
 		return err.Error()
-	}else{
+	} else {
 		wscore.ClientMap.Store(client)
 		return "success"
 	}

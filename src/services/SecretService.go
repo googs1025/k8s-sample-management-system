@@ -14,9 +14,9 @@ func NewSecretService() *SecretService {
 	return &SecretService{}
 }
 // 前台用于显示Secret列表
-func(s *SecretService) ListSecretByNamespace(nampspace string) []*models.SecretModel {
+func(s *SecretService) ListSecretByNamespace(namespace string) []*models.SecretModel {
 
-	list := s.SecretMap.ListAll(nampspace)
+	list := s.SecretMap.ListAll(namespace)
 	ret := make([]*models.SecretModel,len(list))
 	for i, item := range list{
 		ret[i] = &models.SecretModel {

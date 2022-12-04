@@ -18,9 +18,9 @@ func NewStatefulSetCtl() *StatefulSetCtl {
 	}
 }
 
-// Name 实现job controller 框架规范
+// Name 实现statefulset controller 框架规范
 func (*StatefulSetCtl) Name() string {
-	return "CronJobCtl"
+	return "StatefulSetCtl"
 }
 
 // Build 实现job controller 路由 框架规范
