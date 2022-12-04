@@ -432,3 +432,45 @@ func(s *SecretHandler) OnDelete(obj interface{}){
 		},
 	)
 }
+
+// ConfigMap相关的handler
+type ConfigMapHandler struct {
+	ConfigMap *ConfigMap  `inject:"-"`
+	ConfigMapService *ConfigMapService  `inject:"-"`
+}
+
+func(cm *ConfigMapHandler) OnAdd(obj interface{}){
+	cm.ConfigMap.Add(obj.(*corev1.ConfigMap))
+	ns := obj.(*corev1.ConfigMap).Namespace
+	wscore.ClientMap.SendAll(
+		gin.H{
+			"type":"cm",
+			"result":gin.H{"ns":ns,
+				"data": cm.ConfigMapService.ListConfigMapByNamespace(ns)},
+		},
+	)
+}
+func(cm *ConfigMapHandler) OnUpdate(oldObj, newObj interface{}){
+	//重点： 只要update返回true 才会发送 。否则不发送
+	if cm.ConfigMap.Update(newObj.(*corev1.ConfigMap)){
+		ns := newObj.(*corev1.ConfigMap).Namespace
+		wscore.ClientMap.SendAll(
+			gin.H{
+				"type":"cm",
+				"result":gin.H{"ns":ns,
+					"data": cm.ConfigMapService.ListConfigMapByNamespace(ns)},
+			},
+		)
+	}
+}
+func(cm *ConfigMapHandler) OnDelete(obj interface{}){
+	cm.ConfigMap.Delete(obj.(*corev1.ConfigMap))
+	ns := obj.(*corev1.ConfigMap).Namespace
+	wscore.ClientMap.SendAll(
+		gin.H{
+			"type":"cm",
+			"result":gin.H{"ns":ns,
+				"data": cm.ConfigMapService.ListConfigMapByNamespace(ns)},
+		},
+	)
+}

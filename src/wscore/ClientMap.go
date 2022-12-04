@@ -15,6 +15,7 @@ func init() {
 
 type ClientMapStruct struct {
 	data sync.Map  //  key 是客户端IP  value 就是 WsClient连接对象
+	lock sync.Mutex
 }
 
 func(c *ClientMapStruct) Store(conn *websocket.Conn){
@@ -29,13 +30,20 @@ func(c *ClientMapStruct) Store(conn *websocket.Conn){
 //向所有客户端 发送消息--发送deployment列表
 func(c *ClientMapStruct) SendAll(v interface{}){
 	c.data.Range(func(key, value interface{}) bool {
-		con:=value.(*WsClient).conn
- 			err:=con.WriteJSON(v)
-			if err!=nil{
-				c.Remove(con)
+		c.lock.Lock() //这里加个锁，因为目前不支持并发写wsClient
+		defer c.lock.Unlock()
+		func(){
+			cc := value.(*WsClient).conn
+			//value.(*WsClient).Locker.Lock()
+			//defer value.(*WsClient).Locker.Unlock()
+			err:=cc.WriteJSON(v)
+			if err != nil {
+				c.Remove(cc)
 				log.Println(err)
 			}
-			return true
+		}()
+
+		return true
 	})
 }
 

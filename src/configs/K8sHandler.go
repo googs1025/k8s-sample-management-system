@@ -56,3 +56,8 @@ func(k *K8sHandler) IngressHandler() *services.IngressHandler{
 func(k *K8sHandler) SecretHandler() *services.SecretHandler{
 	return &services.SecretHandler{}
 }
+
+// ConfigMapHandler
+func(k *K8sHandler) ConfigMapHandler() *services.ConfigMapHandler{
+	return &services.ConfigMapHandler{}
+}

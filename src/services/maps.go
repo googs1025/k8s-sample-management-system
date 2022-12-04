@@ -2,6 +2,7 @@ package services
 
 import (
 	"fmt"
+	"k8s-Management-System/src/helpers"
 	"k8s-Management-System/src/models"
 	v1 "k8s.io/api/apps/v1"
 	batchv1 "k8s.io/api/batch/v1"
@@ -666,4 +667,72 @@ func(s *SecretMap) ListAll(namespace string) []*corev1.Secret {
 		return newList
 	}
 	return []*corev1.Secret{} //返回空列表
+}
+
+//给configmap的特殊struct
+type cm struct {
+	cmdata *corev1.ConfigMap
+	md5 string  //对cm的data进行md5存储，防止过度更新
+}
+
+func newcm(c *corev1.ConfigMap) *cm  {
+	return &cm{
+		cmdata:c,//原始对象
+		md5: helpers.Md5Data(c.Data),
+	}
+}
+type ConfigMap struct {
+	data sync.Map   // [ns string] []*cm
+}
+func(c *ConfigMap) Get(ns string,name string) *corev1.ConfigMap{
+	if items,ok:=c.data.Load(ns);ok{
+		for _,item:=range items.([]*cm){
+			if item.cmdata.Name==name{
+				return item.cmdata
+			}
+		}
+	}
+	return nil
+}
+func(c *ConfigMap) Add(item *corev1.ConfigMap){
+	if list,ok:=c.data.Load(item.Namespace);ok{
+		list=append(list.([]*cm),newcm(item))
+		c.data.Store(item.Namespace,list)
+	}else{
+		c.data.Store(item.Namespace,[]*cm{newcm(item)})
+	}
+}
+//返回值 是true 或false . true代表有值更新了， 否则返回false
+func(c *ConfigMap) Update(item *corev1.ConfigMap) bool {
+	if list,ok:=c.data.Load(item.Namespace);ok{
+		for i,range_item:=range list.([]*cm){
+			//这里做判断，如果没变化就不做 更新
+			if range_item.cmdata.Name==item.Name && !helpers.CmIsEq(range_item.cmdata.Data,item.Data){
+				list.([]*cm)[i]=newcm(item)
+				return true //代表有值更新了
+			}
+		}
+	}
+	return 	  false
+}
+func(c *ConfigMap) Delete(svc *corev1.ConfigMap){
+	if list,ok:=c.data.Load(svc.Namespace);ok{
+		for i,range_item:=range list.([]*cm){
+			if range_item.cmdata.Name==svc.Name{
+				newList:= append(list.([]*cm)[:i], list.([]*cm)[i+1:]...)
+				c.data.Store(svc.Namespace,newList)
+				break
+			}
+		}
+	}
+}
+func(c *ConfigMap) ListAll(ns string) []*corev1.ConfigMap {
+	ret := []*corev1.ConfigMap{}
+	if list, ok := c.data.Load(ns);ok{
+		newList := list.([]*cm)
+		for _, cm := range newList{
+			ret = append(ret,cm.cmdata)
+		}
+	}
+	return ret //返回空列表
 }

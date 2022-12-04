@@ -57,10 +57,16 @@ func(k *K8sMaps) InitIngressMap() *services.IngressMap{
 	return &services.IngressMap{}
 }
 
-//初始化 Secret map
+// 初始化 Secret map
 func(k *K8sMaps) InitSecretMap() *services.SecretMap{
 	return &services.SecretMap{}
 }
+
+// 初始化 ConfigMap map
+func(k *K8sMaps) InitConfigMap() *services.ConfigMap{
+	return &services.ConfigMap{}
+}
+
 
 // 初始化 service map
 //func(k *K8sMaps) InitCRDMap() *services.CRDMap {

@@ -45,6 +45,10 @@ func(*ServiceConfig) SecretService() *services.SecretService{
 	return services.NewSecretService()
 }
 
+func(*ServiceConfig) ConfigMapService() *services.ConfigMapService{
+	return services.NewConfigMapService()
+}
+
 //func (*ServiceConfig) CRDService() *services.ServiceService {
 //	return services.NewCRDService()
 //}

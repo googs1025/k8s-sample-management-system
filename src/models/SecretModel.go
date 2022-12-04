@@ -20,4 +20,13 @@ type SecretModel struct {
 	NameSpace string
 	CreateTime string
 	Type string  //类型
+	Data map[string][]byte  // KV
+}
+
+//提交 用的
+type PostSecretModel struct {
+	Name string
+	NameSpace string
+	Type string  //类型
+	Data map[string]string
 }
