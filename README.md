@@ -67,7 +67,7 @@ func (*K8sConfig) InitClient() kubernetes.Interface {
 4. 使用postman调用接口
 调用接口方法
 ```
-查训列表接口
+查询列表接口
 http://localhost:8080/deployments
 http://localhost:8080/pods
 http://localhost:8080/services
