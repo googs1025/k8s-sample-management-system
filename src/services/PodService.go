@@ -13,6 +13,20 @@ func NewPodService() *PodService {
 	return &PodService{}
 }
 
+// GetPodContainer 获取Pod容器列表
+func(p *PodService) GetPodContainer(ns , podName string) []*models.ContainerModel{
+	ret := make([]*models.ContainerModel, 0)
+	pod := p.PodMap.GetPod(ns, podName)
+	if pod != nil{
+		for _, c := range pod.Spec.Containers {
+			ret = append(ret, &models.ContainerModel{
+				Name: c.Name,
+			})
+		}
+	}
+	return ret
+}
+
 func(p *PodService) ListByNamespace(namespace string) []*models.Pod {
 	podList := p.PodMap.ListByNamespace(namespace)
 	res := make([]*models.Pod, 0)

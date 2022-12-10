@@ -14,6 +14,15 @@ func NewPodCtl() *PodCtl {
 	return &PodCtl{}
 }
 
+func (p *PodCtl) Containers(c *gin.Context) goft.Json {
+	namespace := c.DefaultQuery("namespace", "default")
+	podName := c.DefaultQuery("name", "")
+	return gin.H{
+		"code": 20000,
+		"data": p.PodService.GetPodContainer(namespace, podName),
+	}
+}
+
 func(p *PodCtl) List(c *gin.Context) goft.Json{
 	namespace := c.DefaultQuery("namespace", "default")
 	return gin.H{
@@ -25,7 +34,8 @@ func(p *PodCtl) List(c *gin.Context) goft.Json{
 
 
 func(p *PodCtl)  Build(goft *goft.Goft){
-	goft.Handle("GET","/pods",p.List)
+	goft.Handle("GET","/pods", p.List)
+	goft.Handle("GET","/pods/containers", p.Containers)
 }
 
 
