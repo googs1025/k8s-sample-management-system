@@ -16,6 +16,7 @@
 **服务发现**
 1. service
 2. ingress
+
 **配置文件**
 1. configmap
 2. secret
