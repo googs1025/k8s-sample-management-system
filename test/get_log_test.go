@@ -15,10 +15,10 @@ func TestPodLog(t *testing.T) {
 
 
 	// 单次查看log日志
-	res := client.CoreV1().Pods("default").GetLogs("myredis-0", &v1.PodLogOptions{})
-	ret := res.Do(context.Background())
-	b, _ := ret.Raw()
-	fmt.Println(string(b))
+	//res := client.CoreV1().Pods("default").GetLogs("myredis-0", &v1.PodLogOptions{})
+	//ret := res.Do(context.Background())
+	//b, _ := ret.Raw()
+	//fmt.Println(string(b))
 
 
 	// 流方式watch日志

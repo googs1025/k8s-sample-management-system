@@ -6,6 +6,7 @@ import (
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
 	"log"
 )
 
@@ -27,11 +28,21 @@ func NewK8sConfig() *K8sConfig {
 	return &K8sConfig{}
 }
 
-func (*K8sConfig) InitClient() kubernetes.Interface {
-	config := &rest.Config{
-		Host: "http://1.14.120.233:8009",
+func(*K8sConfig) K8sRestConfig() *rest.Config{
+	config, err := clientcmd.BuildConfigFromFlags("","/Users/zhenyu.jiang/go/src/golanglearning/new_project/k8s-Management-System/config" )
+	config.Insecure = true
+	if err != nil {
+		log.Fatal(err)
 	}
-	client, err := kubernetes.NewForConfig(config)
+	return config
+}
+
+func (k *K8sConfig) InitClient() kubernetes.Interface {
+	//config := &rest.Config{
+	//	Host: "http://1.14.120.233:8009",
+	//}
+
+	client, err := kubernetes.NewForConfig(k.K8sRestConfig())
 	if err != nil {
 		log.Fatal(err)
 	}
