@@ -67,6 +67,12 @@ func(k *K8sMaps) InitConfigMap() *services.ConfigMap{
 	return &services.ConfigMap{}
 }
 
+//初始化NodeMap
+func(k *K8sMaps) InitNodeMap() *services.NodeMap{
+	return &services.NodeMap{}
+}
+
+
 
 // 初始化 service map
 //func(k *K8sMaps) InitCRDMap() *services.CRDMap {

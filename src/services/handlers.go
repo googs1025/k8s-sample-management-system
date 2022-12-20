@@ -474,3 +474,44 @@ func(cm *ConfigMapHandler) OnDelete(obj interface{}){
 		},
 	)
 }
+
+//Node相关的handler
+type NodeHandler struct {
+	NodeMap *NodeMap  `inject:"-"`
+	NodeService *NodeService `inject:"-"`
+}
+
+func(nm *NodeHandler) OnAdd(obj interface{}){
+	nm.NodeMap.Add(obj.(*corev1.Node))
+
+	wscore.ClientMap.SendAll(
+		gin.H{
+			"type":"node",
+			"result":gin.H{"ns":"node",
+				"data":nm.NodeService.ListAllNodes()},
+		},
+	)
+}
+func(nm *NodeHandler) OnUpdate(oldObj, newObj interface{}){
+	//重点： 只要update返回true 才会发送 。否则不发送
+	if nm.NodeMap.Update(newObj.(*corev1.Node)){
+		wscore.ClientMap.SendAll(
+			gin.H{
+				"type":"node",
+				"result":gin.H{"ns":"node",
+					"data":nm.NodeService.ListAllNodes()},
+			},
+		)
+	}
+}
+func(nm *NodeHandler) OnDelete(obj interface{}){
+	nm.NodeMap.Delete(obj.(*corev1.Node))
+
+	wscore.ClientMap.SendAll(
+		gin.H{
+			"type":"node",
+			"result":gin.H{"ns":"node",
+				"data":nm.NodeService.ListAllNodes()},
+		},
+	)
+}

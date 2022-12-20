@@ -7,6 +7,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
+	"k8s.io/metrics/pkg/client/clientset/versioned"
 	"log"
 )
 
@@ -22,6 +23,7 @@ type K8sConfig struct {
 	IngressHandler *services.IngressHandler `inject:"-"`
 	SecretHandler *services.SecretHandler `inject:"-"`
 	ConfigMapHandler *services.ConfigMapHandler `inject:"-"`
+	NodeHandler *services.NodeHandler `inject:"-"`
 }
 
 func NewK8sConfig() *K8sConfig {
@@ -35,6 +37,16 @@ func(*K8sConfig) K8sRestConfig() *rest.Config{
 		log.Fatal(err)
 	}
 	return config
+}
+
+// metric客户端
+func(k *K8sConfig) InitMetricClient() *versioned.Clientset {
+
+	c, err := versioned.NewForConfig(k.K8sRestConfig())
+	if err != nil {
+		log.Fatal(err)
+	}
+	return c
 }
 
 func (k *K8sConfig) InitClient() kubernetes.Interface {
@@ -87,6 +99,8 @@ func (k *K8sConfig) InitInformer() informers.SharedInformerFactory {
 	ConfigMapInformer := fact.Core().V1().ConfigMaps() //监听 Configmap
 	ConfigMapInformer.Informer().AddEventHandler(k.ConfigMapHandler)
 
+	NodeInformer := fact.Core().V1().Nodes()
+	NodeInformer.Informer().AddEventHandler(k.NodeHandler)
 
 
 	fact.Start(wait.NeverStop)

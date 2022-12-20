@@ -49,6 +49,10 @@ func(*ServiceConfig) ConfigMapService() *services.ConfigMapService{
 	return services.NewConfigMapService()
 }
 
+func(*ServiceConfig) NodeService() *services.NodeService{
+	return services.NewNodeService()
+}
+
 //func (*ServiceConfig) CRDService() *services.ServiceService {
 //	return services.NewCRDService()
 //}
