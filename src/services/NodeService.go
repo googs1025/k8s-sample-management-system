@@ -3,6 +3,7 @@ package services
 import (
 	"k8s-Management-System/src/helpers"
 	"k8s-Management-System/src/models"
+	"k8s.io/api/core/v1"
 	"k8s.io/metrics/pkg/client/clientset/versioned"
 )
 
@@ -26,7 +27,7 @@ func (ns *NodeService) ListAllNodes() []*models.NodeModel{
 		ret[i] = &models.NodeModel{
 			Name: node.Name,
 			IP: node.Status.Addresses[0].Address,
-			Lables: helpers.FilterLabels(node.Labels),
+			Labels: helpers.FilterLabels(node.Labels),
 			Taints: helpers.FilterTaints(node.Spec.Taints),
 			HostName: node.Status.Addresses[1].Address,
 			Capacity: models.NewNodeCapacity(node.Status.Capacity.Cpu().Value(),
@@ -36,4 +37,23 @@ func (ns *NodeService) ListAllNodes() []*models.NodeModel{
 		}
 	}
 	return ret
+}
+
+
+// LoadOriginNode 保存时用的
+func(ns *NodeService) LoadOriginNode(nodeName string ) *v1.Node{
+	return ns.NodeMap.Get(nodeName)
+}
+
+// LoadNode 加载node信息，给编辑用的
+func(ns *NodeService) LoadNode(nodeName string ) *models.NodeModel{
+	node := ns.NodeMap.Get(nodeName)
+	return &models.NodeModel{
+		Name: node.Name,
+		IP: node.Status.Addresses[0].Address,
+		HostName: node.Status.Addresses[1].Address,
+		OriginLabels: node.Labels,
+		OriginTaints: node.Spec.Taints,
+		CreateTime: node.CreationTimestamp.Format("2006-01-02 15:04:05"),
+	}
 }

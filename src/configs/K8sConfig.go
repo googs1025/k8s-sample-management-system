@@ -1,6 +1,9 @@
 package configs
 
 import (
+	"gopkg.in/yaml.v2"
+	"io/ioutil"
+	"k8s-Management-System/src/models"
 	"k8s-Management-System/src/services"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/informers"
@@ -28,6 +31,20 @@ type K8sConfig struct {
 
 func NewK8sConfig() *K8sConfig {
 	return &K8sConfig{}
+}
+
+//初始化 系统 配置
+func(*K8sConfig) InitSysConfig() *models.SysConfig{
+	b, err := ioutil.ReadFile("app.yaml")
+	if err != nil {
+		log.Fatal(err)
+	}
+	config := &models.SysConfig{}
+	err = yaml.Unmarshal(b,config)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return config
 }
 
 func(*K8sConfig) K8sRestConfig() *rest.Config{

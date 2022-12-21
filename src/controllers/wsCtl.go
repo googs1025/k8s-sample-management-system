@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/shenyisyn/goft-gin/goft"
 	"k8s-Management-System/src/helpers"
+	"k8s-Management-System/src/models"
 	"k8s-Management-System/src/wscore"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -16,6 +17,7 @@ import (
 type WsCtl struct {
 	Client *kubernetes.Clientset  `inject:"-"`
 	Config *rest.Config  `inject:"-"`
+	SysConfig *models.SysConfig   `inject:"-"`
 }
 
 
@@ -55,10 +57,14 @@ func(w *WsCtl) PodConnect(c *gin.Context) (v goft.Void) {
 }
 
 func(w *WsCtl) NodeConnect(c *gin.Context) (v goft.Void){
-	wsClient, err := wscore.Upgrader.Upgrade(c.Writer,c.Request,nil)
+	nodeName := c.Query("node")
+	wsClient, err := wscore.Upgrader.Upgrade(c.Writer, c.Request,nil)
+	nodeConfig := helpers.GetNodeConfig(w.SysConfig, nodeName) //读取配置文件
 	goft.Error(err)
+
 	shellClient := wscore.NewWsShellClient(wsClient)
-	session, err := helpers.SSHConnect(helpers.TempSSHUser,  helpers.TempSSHPWD, helpers.TempSSHIP ,22)
+	// session, err := helpers.SSHConnect(helpers.TempSSHUser,  helpers.TempSSHPWD, helpers.TempSSHIP ,22)
+	session, err := helpers.SSHConnect(nodeConfig.User, nodeConfig.Pass, nodeConfig.Ip ,22 )
 	fmt.Println("error:!!!!", err)
 	goft.Error(err)
 	defer session.Close()

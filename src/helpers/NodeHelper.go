@@ -3,6 +3,7 @@ package helpers
 import (
 	"context"
 	"fmt"
+	"k8s-Management-System/src/models"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/metrics/pkg/client/clientset/versioned"
@@ -41,4 +42,14 @@ func GetNodeUsage(c *versioned.Clientset,node *v1.Node) []float64{
 	cpu := float64(nodeMetric.Usage.Cpu().MilliValue()) / float64(node.Status.Capacity.Cpu().MilliValue())
 	memory := float64(nodeMetric.Usage.Memory().MilliValue()) / float64(node.Status.Capacity.Memory().MilliValue())
 	return []float64{cpu, memory}
+}
+
+//获取节点配置
+func GetNodeConfig(c *models.SysConfig, nodeName string) *models.NodesConfig{
+	for _, node := range c.K8s.Nodes {
+		if node.Name==nodeName{
+			return node
+		}
+	}
+	panic("no such node")
 }

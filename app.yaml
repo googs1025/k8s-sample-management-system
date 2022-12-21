@@ -1,0 +1,14 @@
+k8s:
+  nodes:
+    - name: vm-0-12-centos
+      ip: 1.14.120.233
+      user: root
+      pass: googs1025Aa1234567
+    - name: vm-0-13-centos
+      ip: 162.14.122.129
+      user: root
+      pass: googs1025Aa1234567
+    - name: vm-0-17-centos
+      ip: 42.193.23.83
+      user: root
+      pass: googs1025Aa1234567
