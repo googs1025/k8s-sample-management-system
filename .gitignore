@@ -1,4 +1,7 @@
 
+config
+app.yaml
+
 # Binaries for programs and plugins
 *.exe
 *.exe~
@@ -19,8 +22,6 @@ testbin/*
 !vendor/**/zz_generated.*
 
 # editor and IDE paraphernalia
-config
-app.yaml
 .idea
 *.swp
 *.swo
