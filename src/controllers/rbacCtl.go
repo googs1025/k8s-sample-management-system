@@ -127,7 +127,7 @@ func(r *RBACCtl) UpdateRolesDetail(c *gin.Context) goft.Json{
 	}
 }
 
-//AddUserToRoleBinding 从rolebinding中 增加或删除用户
+// AddUserToRoleBinding 从rolebinding中 增加或删除用户
 func(r *RBACCtl) AddUserToRoleBinding(c *gin.Context) goft.Json{
 	ns := c.DefaultQuery("ns","default")
 	name := c.DefaultQuery("name","") //rolebinding 名称
