@@ -859,3 +859,74 @@ func(r *RoleMap) ListAll(ns string) []*rbacv1.Role {
 
 	return []*rbacv1.Role{} //返回空列表
 }
+
+type V1RoleBinding []*rbacv1.RoleBinding
+
+func(r V1RoleBinding) Len() int{
+	return len(r)
+}
+func(r V1RoleBinding) Less(i, j int) bool{
+	//根据时间排序    倒排序
+	return r[i].CreationTimestamp.Time.After(r[j].CreationTimestamp.Time)
+}
+
+func(r V1RoleBinding) Swap(i, j int){
+	r[i], r[j] = r[j], r[i]
+}
+
+type RoleBindingMap struct {
+	data sync.Map   // [ns string] []*v1.RoleBinding
+}
+
+func(r *RoleBindingMap) Get(ns string,name string) *rbacv1.RoleBinding{
+	if items, ok := r.data.Load(ns); ok {
+		for _, item := range items.([]*rbacv1.RoleBinding) {
+			if item.Name == name {
+				return item
+			}
+		}
+	}
+	return nil
+}
+
+func(r *RoleBindingMap) Add(item *rbacv1.RoleBinding){
+	if list, ok := r.data.Load(item.Namespace); ok {
+		list = append(list.([]*rbacv1.RoleBinding), item)
+		r.data.Store(item.Namespace, list)
+	} else {
+		r.data.Store(item.Namespace, []*rbacv1.RoleBinding{item})
+	}
+}
+
+func(r *RoleBindingMap) Update(item *rbacv1.RoleBinding) error {
+	if list, ok := r.data.Load(item.Namespace); ok {
+		for i,range_item := range list.([]*rbacv1.RoleBinding) {
+			if range_item.Name == item.Name {
+				list.([]*rbacv1.RoleBinding)[i] = item
+			}
+		}
+		return nil
+	}
+	return fmt.Errorf("Role-%s not found",item.Name)
+}
+
+func(r *RoleBindingMap) Delete(svc *rbacv1.RoleBinding){
+	if list, ok := r.data.Load(svc.Namespace); ok {
+		for i, range_item := range list.([]*rbacv1.RoleBinding) {
+			if range_item.Name == svc.Name {
+				newList := append(list.([]*rbacv1.RoleBinding)[:i], list.([]*rbacv1.RoleBinding)[i+1:]...)
+				r.data.Store(svc.Namespace,newList)
+				break
+			}
+		}
+	}
+}
+
+func(r *RoleBindingMap) ListAll(ns string)[]*rbacv1.RoleBinding{
+	if list, ok := r.data.Load(ns); ok{
+		newList := list.([]*rbacv1.RoleBinding)
+		sort.Sort(V1RoleBinding(newList))//  按时间倒排序
+		return newList
+	}
+	return []*rbacv1.RoleBinding{} //返回空列表
+}

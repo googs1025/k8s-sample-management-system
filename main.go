@@ -50,6 +50,7 @@ func main() {
 			controllers.NewPodLogsCtl(),
 			controllers.NewNodeCtl(),
 			controllers.NewRBACCtl(),
+			controllers.NewResourcesCtl(),
 		).
 		Attach(
 			//middlewares.NewCrossMiddleware(), //跨域中间件

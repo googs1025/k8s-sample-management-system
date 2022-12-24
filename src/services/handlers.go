@@ -561,3 +561,47 @@ func(rm *RoleHandler) OnDelete(obj interface{}) {
 	)
 }
 
+type RoleBindingHander struct {
+	RoleBindingMap *RoleBindingMap  `inject:"-"`
+	RoleService *RoleService  `inject:"-"`
+}
+
+func(rbm *RoleBindingHander) OnAdd(obj interface{}){
+	rbm.RoleBindingMap.Add(obj.(*rbacv1.RoleBinding))
+	ns := obj.(*rbacv1.RoleBinding).Namespace
+	wscore.ClientMap.SendAll(
+		gin.H{
+			"type": "rolebinding",
+			"result":gin.H{"ns": ns,
+				"data": rbm.RoleService.ListRoles(ns)},
+		},
+	)
+}
+
+func(rbm *RoleBindingHander) OnUpdate(oldObj, newObj interface{}){
+	err := rbm.RoleBindingMap.Update(newObj.(*rbacv1.RoleBinding))
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	ns := newObj.(*rbacv1.RoleBinding).Namespace
+	wscore.ClientMap.SendAll(
+		gin.H{
+			"type": "rolebinding",
+			"result": gin.H{"ns": ns,
+				"data": rbm.RoleService.ListRoles(ns)},
+		},
+	)
+}
+
+func(rbm *RoleBindingHander) OnDelete(obj interface{}){
+	rbm.RoleBindingMap.Delete(obj.(*rbacv1.RoleBinding))
+	ns := obj.(*rbacv1.Role).Namespace
+	wscore.ClientMap.SendAll(
+		gin.H{
+			"type": "rolebinding",
+			"result": gin.H{"ns": ns,
+				"data": rbm.RoleService.ListRoleBindings(ns)},
+		},
+	)
+}

@@ -28,6 +28,7 @@ type K8sConfig struct {
 	ConfigMapHandler *services.ConfigMapHandler `inject:"-"`
 	NodeHandler *services.NodeHandler `inject:"-"`
 	RoleHandler *services.RoleHandler `inject:"-"`
+	RoleBindingHander *services.RoleBindingHander `inject:"-"`
 }
 
 func NewK8sConfig() *K8sConfig {
@@ -122,6 +123,9 @@ func (k *K8sConfig) InitInformer() informers.SharedInformerFactory {
 
 	RoleInformer := fact.Rbac().V1().Roles()
 	RoleInformer.Informer().AddEventHandler(k.RoleHandler)
+
+	RolesBindingInformer := fact.Rbac().V1().RoleBindings()
+	RolesBindingInformer.Informer().AddEventHandler(k.RoleBindingHander)
 
 	fact.Start(wait.NeverStop)
 

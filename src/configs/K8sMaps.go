@@ -76,6 +76,9 @@ func(k *K8sMaps) InitRoleMap() *services.RoleMap{
 	return &services.RoleMap{}
 }
 
+func(k *K8sMaps) InitRoleBindingMap() *services.RoleBindingMap{
+	return &services.RoleBindingMap{}
+}
 
 // 初始化 service map
 //func(k *K8sMaps) InitCRDMap() *services.CRDMap {

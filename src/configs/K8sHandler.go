@@ -69,3 +69,8 @@ func(k *K8sHandler) NodeHandler() *services.NodeHandler{
 func(k *K8sHandler) RoleHandler() *services.RoleHandler{
 	return &services.RoleHandler{}
 }
+
+// RoleBindingHandler
+func(k *K8sHandler) RoleBindingHandler() *services.RoleBindingHander{
+	return &services.RoleBindingHander{}
+}
