@@ -9,6 +9,7 @@ import (
 	batchv1beta1 "k8s.io/api/batch/v1beta1"
 	corev1 "k8s.io/api/core/v1"
 	networkingv1 "k8s.io/api/networking/v1beta1"
+	rbacv1 "k8s.io/api/rbac/v1"
 	"log"
 )
 
@@ -515,3 +516,48 @@ func(nm *NodeHandler) OnDelete(obj interface{}){
 		},
 	)
 }
+
+type RoleHandler struct {
+	RoleMap *RoleMap  `inject:"-"`
+	RoleService *RoleService  `inject:"-"`
+}
+
+func(rm *RoleHandler) OnAdd(obj interface{}){
+	rm.RoleMap.Add(obj.(*rbacv1.Role))
+	ns := obj.(*rbacv1.Role).Namespace
+	wscore.ClientMap.SendAll(
+		gin.H{
+			"type":"role",
+			"result":gin.H{"ns": ns,
+				"data": rm.RoleService.ListRoles(ns)},
+		},
+	)
+}
+func(rm *RoleHandler) OnUpdate(oldObj, newObj interface{}){
+	err := rm.RoleMap.Update(newObj.(*rbacv1.Role))
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	ns := newObj.(*rbacv1.Role).Namespace
+	wscore.ClientMap.SendAll(
+		gin.H{
+			"type": "role",
+			"result": gin.H{"ns": ns,
+				"data": rm.RoleService.ListRoles(ns)},
+		},
+	)
+}
+func(rm *RoleHandler) OnDelete(obj interface{}) {
+	rm.RoleMap.Delete(obj.(*rbacv1.Role))
+	ns := obj.(*rbacv1.Role).Namespace
+	wscore.ClientMap.SendAll(
+		gin.H{
+			"type": "role",
+			"result": gin.H{"ns": ns,
+				"data": rm.RoleService.ListRoles(ns)},
+		},
+	)
+}
+

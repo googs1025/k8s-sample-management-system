@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/shenyisyn/goft-gin/goft"
 	"io"
@@ -8,7 +9,6 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"net/http"
 	"time"
-	"context"
 )
 
 type PodLogsCtl struct {

@@ -9,6 +9,7 @@ import (
 	batchv1beta1 "k8s.io/api/batch/v1beta1"
 	corev1 "k8s.io/api/core/v1"
 	networkingv1 "k8s.io/api/networking/v1beta1"
+	rbacv1 "k8s.io/api/rbac/v1"
 	"reflect"
 	"sort"
 	"sync"
@@ -695,6 +696,7 @@ func newcm(c *corev1.ConfigMap) *cm  {
 		md5: helpers.Md5Data(c.Data),
 	}
 }
+
 type ConfigMap struct {
 	data sync.Map   // [ns string] []*cm
 }
@@ -784,4 +786,76 @@ func(n *NodeMap) ListAll()[]*corev1.Node{
 		return true
 	})
 	return ret//返回空列表
+}
+
+
+type V1Role []*rbacv1.Role
+func(r V1Role) Len() int{
+	return len(r)
+}
+func(r V1Role) Less(i, j int) bool{
+	//根据时间排序    倒排序
+	return r[i].CreationTimestamp.Time.After(r[j].CreationTimestamp.Time)
+}
+func(r V1Role) Swap(i, j int){
+	r[i],r[j]=r[j],r[i]
+}
+
+type RoleMap struct {
+	data sync.Map   // [ns string] []*v1.Role
+}
+
+func(r *RoleMap) Get(ns string,name string) *rbacv1.Role{
+	if items, ok := r.data.Load(ns); ok {
+		for _, item := range items.([]*rbacv1.Role) {
+			if item.Name == name {
+				return item
+			}
+		}
+	}
+	return nil
+}
+
+func(r *RoleMap) Add(item *rbacv1.Role){
+	if list, ok := r.data.Load(item.Namespace); ok {
+		list = append(list.([]*rbacv1.Role), item)
+		r.data.Store(item.Namespace, list)
+	} else {
+		r.data.Store(item.Namespace, []*rbacv1.Role{item})
+	}
+}
+
+func(r *RoleMap) Update(item *rbacv1.Role) error {
+	if list, ok := r.data.Load(item.Namespace); ok {
+		for i, range_item := range list.([]*rbacv1.Role) {
+			if range_item.Name == item.Name {
+				list.([]*rbacv1.Role)[i] = item
+			}
+		}
+		return nil
+	}
+	return fmt.Errorf("Role-%s not found", item.Name)
+}
+
+func(r *RoleMap) Delete(svc *rbacv1.Role){
+	if list, ok := r.data.Load(svc.Namespace); ok {
+
+		for i,range_item := range list.([]*rbacv1.Role) {
+			if range_item.Name == svc.Name {
+				newList:= append(list.([]*rbacv1.Role)[:i], list.([]*rbacv1.Role)[i+1:]...)
+				r.data.Store(svc.Namespace,newList)
+				break
+			}
+		}
+	}
+}
+
+func(r *RoleMap) ListAll(ns string) []*rbacv1.Role {
+	if list,ok := r.data.Load(ns); ok {
+		newList := list.([]*rbacv1.Role)
+		sort.Sort(V1Role(newList))//  按时间倒排序
+		return newList
+	}
+
+	return []*rbacv1.Role{} //返回空列表
 }

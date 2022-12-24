@@ -65,3 +65,7 @@ func(k *K8sHandler) ConfigMapHandler() *services.ConfigMapHandler{
 func(k *K8sHandler) NodeHandler() *services.NodeHandler{
 	return &services.NodeHandler{}
 }
+
+func(k *K8sHandler) RoleHandler() *services.RoleHandler{
+	return &services.RoleHandler{}
+}

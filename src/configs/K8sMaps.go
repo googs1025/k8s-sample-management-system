@@ -72,6 +72,9 @@ func(k *K8sMaps) InitNodeMap() *services.NodeMap{
 	return &services.NodeMap{}
 }
 
+func(k *K8sMaps) InitRoleMap() *services.RoleMap{
+	return &services.RoleMap{}
+}
 
 
 // 初始化 service map

@@ -53,6 +53,11 @@ func(*ServiceConfig) NodeService() *services.NodeService{
 	return services.NewNodeService()
 }
 
+func(*ServiceConfig) RoleService() *services.RoleService{
+	return services.NewRoleService()
+}
+
+
 //func (*ServiceConfig) CRDService() *services.ServiceService {
 //	return services.NewCRDService()
 //}
