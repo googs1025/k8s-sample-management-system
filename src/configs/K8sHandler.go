@@ -74,3 +74,8 @@ func(k *K8sHandler) RoleHandler() *services.RoleHandler{
 func(k *K8sHandler) RoleBindingHandler() *services.RoleBindingHander{
 	return &services.RoleBindingHander{}
 }
+
+// SaHandler
+func(k *K8sHandler) SaHandler() *services.SaHandler{
+	return &services.SaHandler{}
+}

@@ -930,3 +930,73 @@ func(r *RoleBindingMap) ListAll(ns string)[]*rbacv1.RoleBinding{
 	}
 	return []*rbacv1.RoleBinding{} //返回空列表
 }
+
+type CoreV1Sa []*corev1.ServiceAccount
+
+func(c CoreV1Sa) Len() int{
+	return len(c)
+}
+func(c CoreV1Sa) Less(i, j int) bool{
+	//根据时间排序    倒排序
+	return c[i].CreationTimestamp.Time.After(c[j].CreationTimestamp.Time)
+}
+func(c CoreV1Sa) Swap(i, j int){
+	c[i], c[j] = c[j], c[i]
+}
+
+type SaMap struct {
+	data sync.Map   // [ns string] []*corev1.ServiceAccount
+}
+
+func(sm *SaMap) Get(ns string,name string) *corev1.ServiceAccount{
+	if items, ok := sm.data.Load(ns); ok {
+		for _, item := range items.([]*corev1.ServiceAccount){
+			if item.Name == name {
+				return item
+			}
+		}
+	}
+	return nil
+}
+
+func(sm *SaMap) Add(item *corev1.ServiceAccount){
+	if list, ok := sm.data.Load(item.Namespace); ok {
+		list = append(list.([]*corev1.ServiceAccount), item)
+		sm.data.Store(item.Namespace, list)
+	} else {
+		sm.data.Store(item.Namespace, []*corev1.ServiceAccount{item})
+	}
+}
+
+func(sm *SaMap) Update(item *corev1.ServiceAccount) error {
+	if list, ok := sm.data.Load(item.Namespace); ok {
+		for i, range_item := range list.([]*corev1.ServiceAccount) {
+			if range_item.Name == item.Name {
+				list.([]*corev1.ServiceAccount)[i] = item
+			}
+		}
+		return nil
+	}
+	return fmt.Errorf("ServiceAccount-%s not found",item.Name)
+}
+
+func(sm *SaMap) Delete(sa *corev1.ServiceAccount){
+	if list,ok := sm.data.Load(sa.Namespace); ok {
+		for i, range_item := range list.([]*corev1.ServiceAccount) {
+			if range_item.Name == sa.Name {
+				newList := append(list.([]*corev1.ServiceAccount)[:i], list.([]*corev1.ServiceAccount)[i+1:]...)
+				sm.data.Store(sa.Namespace, newList)
+				break
+			}
+		}
+	}
+}
+
+func(sm *SaMap) ListAll(ns string)[]*corev1.ServiceAccount{
+	if list, ok := sm.data.Load(ns); ok {
+		newList := list.([]*corev1.ServiceAccount)
+		sort.Sort(CoreV1Sa(newList))//  按时间倒排序
+		return newList
+	}
+	return []*corev1.ServiceAccount{} //返回空列表
+}

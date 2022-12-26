@@ -12,6 +12,7 @@ import (
 
 type RBACCtl struct {
 	RoleService *services.RoleService `inject:"-"`
+	SaService *services.SaService `inject:"-"`
 	Client *kubernetes.Clientset `inject:"-"`
 }
 
@@ -41,6 +42,8 @@ func(r *RBACCtl) Build(goft *goft.Goft) {
 	goft.Handle("DELETE","/roles", r.DeleteRole)
 	goft.Handle("POST","/rolebindings", r.CreateRoleBinding)
 	goft.Handle("DELETE","/rolebindings", r.DeleteRoleBinding)
+
+	goft.Handle("GET","/sa", r.SaList)
 }
 
 func(r *RBACCtl) RoleBindingList(c *gin.Context) goft.Json{
@@ -154,5 +157,13 @@ func(r *RBACCtl) AddUserToRoleBinding(c *gin.Context) goft.Json{
 	return gin.H{
 		"code": 20000,
 		"data": "success",
+	}
+}
+
+func(r *RBACCtl) SaList(c *gin.Context) goft.Json{
+	ns := c.DefaultQuery("ns","default")
+	return gin.H{
+		"code": 20000,
+		"data": r.SaService.ListSa(ns),
 	}
 }

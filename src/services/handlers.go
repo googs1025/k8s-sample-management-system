@@ -605,3 +605,47 @@ func(rbm *RoleBindingHander) OnDelete(obj interface{}){
 		},
 	)
 }
+
+type SaHandler struct {
+	SaMap *SaMap  `inject:"-"`
+	SaService *SaService  `inject:"-"`
+}
+
+func(sm *SaHandler) OnAdd(obj interface{}){
+	sm.SaMap.Add(obj.(*corev1.ServiceAccount))
+	ns := obj.(*corev1.ServiceAccount).Namespace
+	wscore.ClientMap.SendAll(
+		gin.H{
+			"type":"sa",
+			"result": gin.H{"ns": ns,
+				"data": sm.SaService.ListSa(ns)},
+		},
+	)
+}
+
+func(sm *SaHandler) OnUpdate(oldObj, newObj interface{}){
+	err := sm.SaMap.Update(newObj.(*corev1.ServiceAccount))
+	if err != nil{
+		return
+	}
+	ns := newObj.(*corev1.ServiceAccount).Namespace
+	wscore.ClientMap.SendAll(
+		gin.H{
+			"type":"sa",
+			"result":gin.H{"ns": ns,
+				"data": sm.SaService.ListSa(ns)},
+		},
+	)
+}
+
+func(sm *SaHandler) OnDelete(obj interface{}){
+	sm.SaMap.Delete(obj.(*corev1.ServiceAccount))
+	ns := obj.(*corev1.ServiceAccount).Namespace
+	wscore.ClientMap.SendAll(
+		gin.H{
+			"type": "sa",
+			"result":gin.H{"ns": ns,
+				"data": sm.SaService.ListSa(ns)},
+		},
+	)
+}

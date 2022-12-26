@@ -57,6 +57,10 @@ func(*ServiceConfig) RoleService() *services.RoleService{
 	return services.NewRoleService()
 }
 
+func(*ServiceConfig) SaService() *services.SaService{
+	return services.NewSaService()
+}
+
 
 //func (*ServiceConfig) CRDService() *services.ServiceService {
 //	return services.NewCRDService()
