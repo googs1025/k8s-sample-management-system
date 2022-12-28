@@ -84,6 +84,10 @@ func(k *K8sMaps) InitSaMap() *services.SaMap{
 	return &services.SaMap{}
 }
 
+func(this *K8sMaps) InitClusterRoleMap() *services.ClusterRoleMap{
+	return &services.ClusterRoleMap{}
+}
+
 // 初始化 service map
 //func(k *K8sMaps) InitCRDMap() *services.CRDMap {
 //	return &services.CRDMap{}

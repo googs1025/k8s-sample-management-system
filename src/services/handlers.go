@@ -649,3 +649,45 @@ func(sm *SaHandler) OnDelete(obj interface{}){
 		},
 	)
 }
+
+type ClusterRoleHandler struct {
+	ClusterRoleMap *ClusterRoleMap  `inject:"-"`
+	RoleService *RoleService `inject:"-"`
+}
+
+func(crm *ClusterRoleHandler) OnAdd(obj interface{}){
+	crm.ClusterRoleMap.Add(obj.(*rbacv1.ClusterRole))
+	wscore.ClientMap.SendAll(
+		gin.H{
+			"type": "clusterrole",
+			"result": gin.H{"ns": "clusterrole",
+				"data": crm.RoleService.ListClusterRoles()},
+		},
+	)
+}
+
+func(crm *ClusterRoleHandler) OnUpdate(oldObj, newObj interface{}){
+	err := crm.ClusterRoleMap.Update(newObj.(*rbacv1.ClusterRole))
+	if err != nil {
+		return
+	}
+
+	wscore.ClientMap.SendAll(
+		gin.H{
+			"type": "clusterrole",
+			"result": gin.H{"ns": "clusterrole",
+				"data": crm.RoleService.ListClusterRoles()},
+		},
+	)
+}
+
+func(crm *ClusterRoleHandler) OnDelete(obj interface{}){
+	crm.ClusterRoleMap.Delete(obj.(*rbacv1.ClusterRole))
+	wscore.ClientMap.SendAll(
+		gin.H{
+			"type": "clusterrole",
+			"result": gin.H{"ns": "clusterrole",
+				"data": crm.RoleService.ListClusterRoles()},
+		},
+	)
+}

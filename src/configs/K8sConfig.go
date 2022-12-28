@@ -30,6 +30,7 @@ type K8sConfig struct {
 	RoleHandler *services.RoleHandler `inject:"-"`
 	RoleBindingHander *services.RoleBindingHander `inject:"-"`
 	SaHandler *services.SaHandler `inject:"-"`
+	ClusterRoleHandler *services.ClusterRoleHandler `inject:"-"`
 }
 
 func NewK8sConfig() *K8sConfig {
@@ -130,6 +131,9 @@ func (k *K8sConfig) InitInformer() informers.SharedInformerFactory {
 
 	SaInformer := fact.Core().V1().ServiceAccounts()
 	SaInformer.Informer().AddEventHandler(k.SaHandler)
+
+	ClusterRoleInformer := fact.Rbac().V1().ClusterRoles()
+	ClusterRoleInformer.Informer().AddEventHandler(k.ClusterRoleHandler)
 
 	fact.Start(wait.NeverStop)
 

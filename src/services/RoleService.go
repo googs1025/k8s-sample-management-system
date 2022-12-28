@@ -3,13 +3,13 @@ package services
 import (
 	"k8s-Management-System/src/models"
 	rbacv1 "k8s.io/api/rbac/v1"
-
 )
 
 //@Service
 type RoleService struct {
 	RoleMap *RoleMap  `inject:"-"`
 	RoleBindingMap *RoleBindingMap  `inject:"-"`
+	ClusterRoleMap *ClusterRoleMap  `inject:"-"`
 }
 
 func NewRoleService() *RoleService {
@@ -43,6 +43,10 @@ func(rs *RoleService) ListRoleBindings(ns string) []*models.RoleBindingModel {
 		}
 	}
 	return ret
+}
+
+func(rs *RoleService) ListClusterRoles() []*rbacv1.ClusterRole {
+	return rs.ClusterRoleMap.ListAll()
 }
 
 func(rs *RoleService) GetRole(ns, name string) *rbacv1.Role{

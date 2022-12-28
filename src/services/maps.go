@@ -1000,3 +1000,57 @@ func(sm *SaMap) ListAll(ns string)[]*corev1.ServiceAccount{
 	}
 	return []*corev1.ServiceAccount{} //返回空列表
 }
+
+
+type V1ClusterRole []*rbacv1.ClusterRole
+
+func(crm V1ClusterRole) Len() int{
+	return len(crm)
+}
+
+func(crm V1ClusterRole) Less(i, j int) bool{
+	//根据时间排序    倒排序
+	return crm[i].CreationTimestamp.Time.After(crm[j].CreationTimestamp.Time)
+}
+
+func(crm V1ClusterRole) Swap(i, j int){
+	crm[i], crm[j]= crm[j], crm[i]
+}
+
+type ClusterRoleMap struct {
+	data sync.Map   // [name string] *v1.ClusterRole      之前的Role是 [ns name] []*v1.Role
+	//因此下面的方法和Role是不一样的
+}
+
+func(crm *ClusterRoleMap) Get(name string) *rbacv1.ClusterRole{
+	if item, ok := crm.data.Load(name); ok {
+		return item.(*rbacv1.ClusterRole)
+	}
+	return nil
+}
+
+func(crm *ClusterRoleMap) Add(item *rbacv1.ClusterRole){
+	crm.data.Store(item.Name, item)
+}
+
+func(crm *ClusterRoleMap) Update(item *rbacv1.ClusterRole) error {
+	crm.data.Store(item.Name, item)
+	return nil
+}
+
+func(crm *ClusterRoleMap) Delete(svc *rbacv1.ClusterRole){
+	crm.data.Delete(svc.Name)
+
+}
+
+// 这里不需要填写ns参数
+func(crm *ClusterRoleMap) ListAll()[]*rbacv1.ClusterRole{
+	list := []*rbacv1.ClusterRole{}
+	crm.data.Range(func(key, value interface{}) bool {
+		list = append(list, value.(*rbacv1.ClusterRole))
+		return true
+	})
+
+	sort.Sort(V1ClusterRole(list))
+	return list
+}

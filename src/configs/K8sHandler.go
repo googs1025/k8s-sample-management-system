@@ -79,3 +79,8 @@ func(k *K8sHandler) RoleBindingHandler() *services.RoleBindingHander{
 func(k *K8sHandler) SaHandler() *services.SaHandler{
 	return &services.SaHandler{}
 }
+
+// ClusterRoleHandler
+func(k *K8sHandler) ConfigClusterRoleHandler() *services.ClusterRoleHandler{
+	return &services.ClusterRoleHandler{}
+}

@@ -44,6 +44,10 @@ func(r *RBACCtl) Build(goft *goft.Goft) {
 	goft.Handle("DELETE","/rolebindings", r.DeleteRoleBinding)
 
 	goft.Handle("GET","/sa", r.SaList)
+
+	goft.Handle("GET","/clusterroles", r.ClusterRoles)
+	goft.Handle("DELETE","/clusterroles", r.DeleteClusterRole)
+
 }
 
 func(r *RBACCtl) RoleBindingList(c *gin.Context) goft.Json{
@@ -165,5 +169,23 @@ func(r *RBACCtl) SaList(c *gin.Context) goft.Json{
 	return gin.H{
 		"code": 20000,
 		"data": r.SaService.ListSa(ns),
+	}
+}
+
+func(r *RBACCtl) ClusterRoles(c *gin.Context) goft.Json{
+	return gin.H{
+		"code":20000,
+		"data": r.RoleService.ListClusterRoles(),
+	}
+}
+
+func(r *RBACCtl) DeleteClusterRole(c *gin.Context) goft.Json{
+	name := c.DefaultQuery("name","")
+
+	err := r.Client.RbacV1().ClusterRoles().Delete(c, name, metav1.DeleteOptions{})
+	goft.Error(err)
+	return gin.H{
+		"code": 20000,
+		"data": "success",
 	}
 }
