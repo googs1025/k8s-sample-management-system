@@ -47,6 +47,9 @@ func(r *RBACCtl) Build(goft *goft.Goft) {
 
 	goft.Handle("GET","/clusterroles", r.ClusterRoles)
 	goft.Handle("DELETE","/clusterroles", r.DeleteClusterRole)
+	goft.Handle("POST","/clusterroles", r.CreateClusterRole) //创建集群角色
+	goft.Handle("POST","/clusterroles/:cname", r.UpdateClusterRolesDetail)
+	goft.Handle("GET","/clusterroles/:cname", r.ClusterRolesDetail)
 
 }
 
@@ -187,5 +190,45 @@ func(r *RBACCtl) DeleteClusterRole(c *gin.Context) goft.Json{
 	return gin.H{
 		"code": 20000,
 		"data": "success",
+	}
+}
+
+//创建集群角色
+func(r *RBACCtl) CreateClusterRole(c *gin.Context) goft.Json{
+	clusterRole := rbacv1.ClusterRole{} //原生的k8s role 对象
+	goft.Error(c.ShouldBindJSON(&clusterRole))
+	clusterRole.APIVersion = "rbac.authorization.k8s.io/v1"
+	clusterRole.Kind = "ClusterRole"
+	_, err := r.Client.RbacV1().ClusterRoles().Create(c,&clusterRole,metav1.CreateOptions{})
+	goft.Error(err)
+	return gin.H{
+		"code": 20000,
+		"data": "success",
+	}
+}
+
+//更新集群角色
+func(r *RBACCtl) UpdateClusterRolesDetail(c *gin.Context) goft.Json{
+	cname := c.Param("cname") //集群角色名
+	clusterRole := r.RoleService.GetClusterRole(cname)
+	postRole := rbacv1.ClusterRole{}
+	goft.Error(c.ShouldBindJSON(&postRole))  //获取提交过来的对象
+
+	clusterRole.Rules = postRole.Rules //目前修改只允许修改 rules，其他不允许。大家可以自行扩展，如标签也允许修改
+	_, err := r.Client.RbacV1().ClusterRoles().Update(c,clusterRole,metav1.UpdateOptions{})
+	goft.Error(err)
+	return gin.H{
+		"code": 20000,
+		"data": "success",
+	}
+}
+
+// 获取集群角色详细
+func(r *RBACCtl) ClusterRolesDetail(c *gin.Context) goft.Json{
+
+	rname := c.Param("cname") //集群角色名
+	return gin.H{
+		"code":20000,
+		"data": r.RoleService.GetClusterRole(rname),
 	}
 }

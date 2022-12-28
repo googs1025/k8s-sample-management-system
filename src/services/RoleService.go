@@ -57,6 +57,14 @@ func(rs *RoleService) GetRole(ns, name string) *rbacv1.Role{
 	return rb
 }
 
+func(rs *RoleService) GetClusterRole(name string) *rbacv1.ClusterRole{
+	rb := rs.ClusterRoleMap.Get(name)
+	if rb == nil {
+		panic("no such cluster-role")
+	}
+	return rb
+}
+
 func(rs *RoleService) GetRoleBinding(ns ,name string) *rbacv1.RoleBinding{
 	rb := rs.RoleBindingMap.Get(ns,name)
 	if rb == nil {
