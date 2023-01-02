@@ -44,7 +44,7 @@ func GetNodeUsage(c *versioned.Clientset,node *v1.Node) []float64{
 	return []float64{cpu, memory}
 }
 
-//获取节点配置
+// 获取节点配置
 func GetNodeConfig(c *models.SysConfig, nodeName string) *models.NodesConfig{
 	for _, node := range c.K8s.Nodes {
 		if node.Name==nodeName{

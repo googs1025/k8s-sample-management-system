@@ -84,7 +84,7 @@ func(k *K8sMaps) InitSaMap() *services.SaMap{
 	return &services.SaMap{}
 }
 
-func(this *K8sMaps) InitClusterRoleMap() *services.ClusterRoleMap{
+func(k *K8sMaps) InitClusterRoleMap() *services.ClusterRoleMap{
 	return &services.ClusterRoleMap{}
 }
 

@@ -5,6 +5,8 @@ import (
 	"github.com/shenyisyn/goft-gin/goft"
 	"k8s-Management-System/src/services"
 	"k8s.io/client-go/kubernetes"
+	v1 "k8s.io/api/apps/v1"
+	v12 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // deployment控制器
@@ -28,6 +30,8 @@ func (*DeploymentCtl) Name() string {
 func (d *DeploymentCtl) Build(goft *goft.Goft) {
 	goft.Handle("GET", "/deployments", d.List)
 	goft.Handle("GET","/deployments/:ns/:name", d.LoadDeployment)
+	goft.Handle("POST","/deployments", d.SaveDeployment)
+	goft.Handle("DELETE","/deployments/:ns/:name", d.RmDeployment)
 }
 
 // List 获取dep列表
@@ -51,6 +55,29 @@ func(d *DeploymentCtl) LoadDeployment(c *gin.Context) goft.Json{
 	return gin.H{
 		"code": 20000,
 		"data": dep,
+	}
+}
+
+func(d *DeploymentCtl) SaveDeployment(c *gin.Context) goft.Json{
+	dep := &v1.Deployment{}
+	goft.Error(c.ShouldBindJSON(dep))
+	_, err := d.K8sClient.AppsV1().Deployments(dep.Namespace).Create(c, dep,v12.CreateOptions{})
+	goft.Error(err)
+	return gin.H{
+		"code": 20000,
+		"data": "success",
+	}
+}
+
+func(d *DeploymentCtl) RmDeployment(c *gin.Context) goft.Json{
+	ns := c.Param("ns")
+	name := c.Param("name")
+
+	err := d.K8sClient.AppsV1().Deployments(ns).Delete(c, name, v12.DeleteOptions{})
+	goft.Error(err)
+	return gin.H{
+		"code": 20000,
+		"data": "success",
 	}
 }
 

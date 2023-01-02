@@ -16,9 +16,11 @@ type SecretCtl struct {
 	SecretService *services.SecretService `inject:"-"`
 	Client *kubernetes.Clientset  `inject:"-"`
 }
+
 func NewSecretCtl() *SecretCtl{
 	return &SecretCtl{}
 }
+
 func(*SecretCtl)  Name() string{
 	return "SecretCtl"
 }
@@ -35,10 +37,10 @@ func(s *SecretCtl) RmSecret(c *gin.Context) goft.Json{
 	}
 }
 
-//提交 Secret
+// PostSecret 提交 Secret
 func(s *SecretCtl) PostSecret(c *gin.Context) goft.Json{
-	postModel:=&models.PostSecretModel{}
-	err:=c.ShouldBindJSON(postModel)
+	postModel := &models.PostSecretModel{}
+	err := c.ShouldBindJSON(postModel)
 
 	goft.Error(err)
 	_, err = s.Client.CoreV1().Secrets(postModel.NameSpace).Create(
@@ -55,8 +57,8 @@ func(s *SecretCtl) PostSecret(c *gin.Context) goft.Json{
 	)
 	goft.Error(err)
 	return gin.H{
-		"code":20000,
-		"data":"OK",
+		"code": 20000,
+		"data": "OK",
 	}
 }
 
@@ -64,7 +66,7 @@ func(s *SecretCtl) ListAll(c *gin.Context) goft.Json{
 	ns := c.DefaultQuery("namespace","default")
 	return gin.H{
 		"code":20000,
-		"data": s.SecretService.ListSecretByNamespace(ns), //暂时 不分页
+		"data": s.SecretService.ListSecretByNamespace(ns), //不分页
 	}
 }
 

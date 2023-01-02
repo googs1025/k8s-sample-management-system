@@ -38,7 +38,7 @@ func(n *NodeCtl) SaveNode(c *gin.Context) goft.Json{
 	// 需要用到覆盖，不能直接建立新的。
 	node.Labels = nodeModel.OriginLabels  //覆盖标签
 	node.Spec.Taints = nodeModel.OriginTaints //覆盖 污点
-	_, err := n.Client.CoreV1().Nodes().Update(c, node,v1.UpdateOptions{})
+	_, err := n.Client.CoreV1().Nodes().Update(c, node, v1.UpdateOptions{})
 
 	goft.Error(err)
 

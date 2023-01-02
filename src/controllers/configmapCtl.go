@@ -54,7 +54,7 @@ func(cm *ConfigMapCtl) ListAll(c *gin.Context) goft.Json{
 	ns := c.DefaultQuery("namespace","default")
 	return gin.H{
 		"code": 20000,
-		"data": cm.ConfigService.ListConfigMapByNamespace(ns), //暂时 不分页
+		"data": cm.ConfigService.ListConfigMapByNamespace(ns), // 不分页
 	}
 }
 
@@ -77,12 +77,12 @@ func(cm *ConfigMapCtl) Detail(c *gin.Context) goft.Json{
 	if ns == "" || name == "" {
 		panic("error param:ns or name")
 	}
-	configmap, err := cm.Client.CoreV1().ConfigMaps(ns).Get(c,name,v1.GetOptions{})
+	configmap, err := cm.Client.CoreV1().ConfigMaps(ns).Get(c, name, v1.GetOptions{})
 	goft.Error(err)
 
 	return gin.H{
-		"code":20000,
-		"data":&models.ConfigMapModel {
+		"code": 20000,
+		"data": &models.ConfigMapModel {
 			Name: configmap.Name,
 			NameSpace: configmap.Namespace,
 			CreateTime: configmap.CreationTimestamp.Format("2006-01-02 15:04:05"),

@@ -37,6 +37,7 @@ func(w *WsCtl) Connect(c *gin.Context) string  {
 
 }
 
+// PodConnect 实现前端 pod 内部容器 命令行执行
 func(w *WsCtl) PodConnect(c *gin.Context) (v goft.Void) {
 	namespace := c.Query("namespace")
 	pod := c.Query("pod")
@@ -56,6 +57,7 @@ func(w *WsCtl) PodConnect(c *gin.Context) (v goft.Void) {
 	return
 }
 
+// NodeConnect 实现前端 node介面 命令行执行
 func(w *WsCtl) NodeConnect(c *gin.Context) (v goft.Void){
 	nodeName := c.Query("node")
 	wsClient, err := wscore.Upgrader.Upgrade(c.Writer, c.Request,nil)

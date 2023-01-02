@@ -38,3 +38,4 @@ func (j *JobCtl) List(c *gin.Context) goft.Json {
 	}
 
 }
+// TODO: 实现job的crud

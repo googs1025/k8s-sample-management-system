@@ -30,7 +30,7 @@ func(rc *ResourcesCtl) GetGroupVersion(str string) (group, version string) {
 	panic("error GroupVersion"+str)
 }
 
-//获取所有资源
+// ListResources 获取所有资源: ex kubectl api-resources
 func(rc *ResourcesCtl) ListResources(c *gin.Context) goft.Json{
 
 	_, res, err := rc.Client.ServerGroupsAndResources()
@@ -38,7 +38,13 @@ func(rc *ResourcesCtl) ListResources(c *gin.Context) goft.Json{
 	gRes := make([]*models.GroupResources, 0)
 	for _, r := range res {
 		group, version := rc.GetGroupVersion(r.GroupVersion)
-		gr := &models.GroupResources{Group: group,Version: version,Resources: make([]*models.Resources, 0)}
+
+		gr := &models.GroupResources{
+			Group: group,
+			Version: version,
+			Resources: make([]*models.Resources, 0),
+		}
+
 		for _, rr := range r.APIResources {
 			res := &models.Resources{Name: rr.Name,Verbs: rr.Verbs}
 			gr.Resources = append(gr.Resources,res)

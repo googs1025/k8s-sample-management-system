@@ -19,6 +19,7 @@ func NewPodLogsCtl() *PodLogsCtl {
 	return &PodLogsCtl{}
 }
 
+// GetLogs 使用stream流的方式 进行log日志推送
 func(pl *PodLogsCtl) GetLogs(c *gin.Context) (v goft.Void) {
 	//namespace := c.DefaultQuery("namespace","default")
 	//podName := c.DefaultQuery("podname","")
@@ -54,25 +55,32 @@ func(pl *PodLogsCtl) GetLogs(c *gin.Context) (v goft.Void) {
 	//
 	//return
 
-	ns:=c.DefaultQuery("ns","default")
-	podname:=c.DefaultQuery("podname","")
-	cname:=c.DefaultQuery("cname","")
+	ns := c.DefaultQuery("ns","default")
+	podname := c.DefaultQuery("podname","")
+	cname := c.DefaultQuery("cname","")
 	var tailLine int64=100
-	opt:=&v1.PodLogOptions{Follow:true ,Container:cname,TailLines:&tailLine}
+	opt := &v1.PodLogOptions{
+		Follow:true ,
+		Container:cname,
+		TailLines:&tailLine,
+	}
 
-	cc,_:=context.WithTimeout(c,time.Minute*30) //设置半小时超时时间。否则会造成内存泄露
-	req:=pl.Client.CoreV1().Pods(ns).GetLogs(podname,opt)
-	reader,err:=req.Stream(cc)
+	cc, _ := context.WithTimeout(c, time.Minute*30) //设置半小时超时时间。否则会造成内存泄露
+	req := pl.Client.CoreV1().Pods(ns).GetLogs(podname,opt)
+	reader, err := req.Stream(cc)
 	goft.Error(err)
 	defer reader.Close()
-	for{
-		buf:=make([]byte,1024)
-		n,err:=reader.Read(buf) // 如果 当前日志 读完了。 会阻塞
-		if err!=nil && err!=io.EOF{ //一旦超时 会进入 这个程序 ,,此时一定要break 掉
+
+	for {
+		buf := make([]byte, 1024)
+		n, err := reader.Read(buf) // 如果 当前日志 读完了。 会阻塞
+
+		if err != nil && err != io.EOF{ //一旦超时 会进入 这个程序 ,,此时一定要break 掉
 			break
 		}
-		w,err:=c.Writer.Write([]byte(string(buf[0:n])))
-		if w==0 || err!=nil{
+
+		w, err := c.Writer.Write([]byte(string(buf[0:n])))
+		if w == 0 || err != nil {
 			break
 		}
 		c.Writer.(http.Flusher).Flush()

@@ -72,7 +72,7 @@ func (d *DeploymentMap) ListDeploymentByNamespace(namespace string) ([]*v1.Deplo
 		return deploymentList.([]*v1.Deployment), nil
 	}
 
-	return nil, fmt.Errorf("list deployment error, not found")
+	return []*v1.Deployment{}, nil
 }
 
 // GetDeployment 内存中读取deployment
@@ -150,7 +150,8 @@ func (p *PodMap) Delete(pod *corev1.Pod) {
 		}
 	}
 }
-//根据标签获取 POD列表
+
+// ListByLabels 根据标签获取 POD列表
 func(p *PodMap) ListByLabels(namespace string,labels []map[string]string) ([]*corev1.Pod,error){
 	ret := make([]*corev1.Pod, 0)
 	if podList, ok := p.data.Load(namespace); ok {
@@ -328,7 +329,7 @@ func (j *JobMap) ListJobByNamespace(namespace string) ([]*batchv1.Job, error) {
 		return jobList.([]*batchv1.Job), nil
 	}
 
-	return nil, fmt.Errorf("list job error, not found")
+	return []*batchv1.Job{}, nil
 }
 
 // GetJob 内存中读取job
@@ -684,7 +685,7 @@ func(s *SecretMap) ListAll(namespace string) []*corev1.Secret {
 	return []*corev1.Secret{} //返回空列表
 }
 
-//给configmap的特殊struct
+// 给configmap的特殊struct
 type cm struct {
 	cmdata *corev1.ConfigMap
 	md5 string  //对cm的data进行md5存储，防止过度更新
@@ -692,7 +693,7 @@ type cm struct {
 
 func newcm(c *corev1.ConfigMap) *cm  {
 	return &cm{
-		cmdata:c,//原始对象
+		cmdata: c, //原始对象
 		md5: helpers.Md5Data(c.Data),
 	}
 }
@@ -700,16 +701,18 @@ func newcm(c *corev1.ConfigMap) *cm  {
 type ConfigMap struct {
 	data sync.Map   // [ns string] []*cm
 }
+
 func(c *ConfigMap) Get(ns string,name string) *corev1.ConfigMap{
-	if items,ok:=c.data.Load(ns);ok{
-		for _,item:=range items.([]*cm){
-			if item.cmdata.Name==name{
+	if items, ok := c.data.Load(ns); ok {
+		for _, item := range items.([]*cm) {
+			if item.cmdata.Name == name {
 				return item.cmdata
 			}
 		}
 	}
 	return nil
 }
+
 func(c *ConfigMap) Add(item *corev1.ConfigMap){
 	if list,ok:=c.data.Load(item.Namespace);ok{
 		list=append(list.([]*cm),newcm(item))
@@ -718,7 +721,8 @@ func(c *ConfigMap) Add(item *corev1.ConfigMap){
 		c.data.Store(item.Namespace,[]*cm{newcm(item)})
 	}
 }
-//返回值 是true 或false . true代表有值更新了， 否则返回false
+
+// 返回值 是true 或false . true代表有值更新了， 否则返回false
 func(c *ConfigMap) Update(item *corev1.ConfigMap) bool {
 	if list,ok:=c.data.Load(item.Namespace);ok{
 		for i,range_item:=range list.([]*cm){
@@ -731,17 +735,19 @@ func(c *ConfigMap) Update(item *corev1.ConfigMap) bool {
 	}
 	return 	  false
 }
+
 func(c *ConfigMap) Delete(svc *corev1.ConfigMap){
-	if list,ok:=c.data.Load(svc.Namespace);ok{
-		for i,range_item:=range list.([]*cm){
-			if range_item.cmdata.Name==svc.Name{
-				newList:= append(list.([]*cm)[:i], list.([]*cm)[i+1:]...)
-				c.data.Store(svc.Namespace,newList)
+	if list, ok := c.data.Load(svc.Namespace); ok {
+		for i, range_item := range list.([]*cm) {
+			if range_item.cmdata.Name == svc.Name {
+				newList := append(list.([]*cm)[:i], list.([]*cm)[i+1:]...)
+				c.data.Store(svc.Namespace, newList)
 				break
 			}
 		}
 	}
 }
+
 func(c *ConfigMap) ListAll(ns string) []*corev1.ConfigMap {
 	ret := []*corev1.ConfigMap{}
 	if list, ok := c.data.Load(ns);ok{

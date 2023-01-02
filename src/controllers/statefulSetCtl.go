@@ -39,4 +39,5 @@ func (s *StatefulSetCtl) List(c *gin.Context) goft.Json {
 
 }
 
+// 新增statefulset crud功能
 
