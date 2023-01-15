@@ -27,7 +27,7 @@ func (d *DeploymentHandler) OnAdd(obj interface{}) {
 	wscore.ClientMap.SendAll(
 		gin.H{
 			"type":"deployments",
-			"result":gin.H{"ns":ns,"data":d.DeploymentService.ListAll(obj.(*v1.Deployment).Namespace)},
+			"result":gin.H{"ns": ns,"data": d.DeploymentService.ListAll(obj.(*v1.Deployment).Namespace)},
 		},
 	)
 }
@@ -40,7 +40,7 @@ func (d *DeploymentHandler) OnDelete(obj interface{}) {
 	wscore.ClientMap.SendAll(
 		gin.H{
 			"type":"deployments",
-			"result":gin.H{"ns":ns,"data":d.DeploymentService.ListAll(obj.(*v1.Deployment).Namespace)},
+			"result":gin.H{"ns": ns,"data": d.DeploymentService.ListAll(obj.(*v1.Deployment).Namespace)},
 		},
 	)
 }
@@ -54,7 +54,7 @@ func (d *DeploymentHandler) OnUpdate(oldObj, newObj interface{}) {
 		wscore.ClientMap.SendAll(
 			gin.H{
 				"type":"deployments",
-				"result":gin.H{"ns":ns,"data":d.DeploymentService.ListAll(newObj.(*v1.Deployment).Namespace)},
+				"result":gin.H{"ns": ns,"data": d.DeploymentService.ListAll(newObj.(*v1.Deployment).Namespace)},
 			},
 		)
 	}

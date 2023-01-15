@@ -401,7 +401,7 @@ func (s *ServiceMap) ListServiceByNamespace(namespace string) ([]*corev1.Service
 		return serviceList.([]*corev1.Service), nil
 	}
 
-	return nil, fmt.Errorf("list service error, not found")
+	return []*corev1.Service{}, nil
 }
 
 // GetService 内存中读取service
@@ -473,7 +473,7 @@ func (s *StatefulSetMap) ListStatefulSetByNamespace(namespace string) ([]*v1.Sta
 		return statefulSetList.([]*v1.StatefulSet), nil
 	}
 
-	return nil, fmt.Errorf("list statefulSet error, not found")
+	return []*v1.StatefulSet{}, nil
 }
 
 // GetStatefulSet 内存中读取statefulSet
@@ -545,7 +545,7 @@ func (s *CronJobMap) ListCronJobByNamespace(namespace string) ([]*batchv1beta1.C
 		return cronJobList.([]*batchv1beta1.CronJob), nil
 	}
 
-	return nil, fmt.Errorf("list cronJob error, not found")
+	return []*batchv1beta1.CronJob{}, nil
 }
 
 // GetCronJob 内存中读取cronJob
@@ -611,8 +611,8 @@ func(i *IngressMap) Delete(ingress *networkingv1.Ingress){
 }
 
 func(i *IngressMap) ListAll(ns string)[]*models.IngressModel{
-	if list,ok:=i.data.Load(ns);ok{
-		ingressList:=list.([]*networkingv1.Ingress)
+	if list, ok := i.data.Load(ns); ok {
+		ingressList := list.([]*networkingv1.Ingress)
 
 		ret := make([]*models.IngressModel,len(ingressList))
 		for ii, item := range ingressList{

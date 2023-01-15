@@ -23,6 +23,7 @@ func(*IngressCtl)  Name() string{
 // ListAll 获取ingress列表
 func(i *IngressCtl) ListAll(c *gin.Context) goft.Json{
 	ns := c.DefaultQuery("namespace","default")
+
 	return gin.H{
 		"code":20000,
 		"data":i.IngressMap.ListAll(ns), //暂时 不分页
