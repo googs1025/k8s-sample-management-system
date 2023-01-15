@@ -60,6 +60,28 @@ func (d *DeploymentHandler) OnUpdate(oldObj, newObj interface{}) {
 	}
 }
 
+
+type RsHandler struct {
+	RsMap *RsMap `inject:"-"`
+}
+
+func(rs *RsHandler) OnAdd(obj interface{}){
+	rs.RsMap.Add(obj.(*v1.ReplicaSet))
+}
+
+func(rs *RsHandler) OnUpdate(oldObj, newObj interface{}){
+	err := rs.RsMap.Update(newObj.(*v1.ReplicaSet))
+	if err != nil {
+		log.Println(err)
+	}
+}
+
+func(rs *RsHandler)	OnDelete(obj interface{}){
+	if d, ok := obj.(*v1.ReplicaSet); ok {
+		rs.RsMap.Delete(d)
+	}
+}
+
 // pod相关的回调handler
 type PodHandler struct {
 	PodMap *PodMap `inject:"-"`

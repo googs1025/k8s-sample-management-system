@@ -89,6 +89,51 @@ func (d *DeploymentMap) GetDeployment(namespace string, deploymentName string) (
 	return nil, fmt.Errorf("get deployment error, not found")
 }
 
+// ReplicaSet 集合
+type RsMap struct {
+	data sync.Map   // [key string] []*appv1.ReplicaSet    key=>namespace
+}
+
+func(s *RsMap) Add(rs *v1.ReplicaSet){
+	if list, ok := s.data.Load(rs.Namespace); ok {
+		list = append(list.([]*v1.ReplicaSet), rs)
+		s.data.Store(rs.Namespace, list)
+	} else {
+		s.data.Store(rs.Namespace, []*v1.ReplicaSet{rs})
+	}
+}
+
+func(s *RsMap) Update(rs *v1.ReplicaSet) error {
+	if list, ok := s.data.Load(rs.Namespace); ok {
+		for i, needUpdateRs := range list.([]*v1.ReplicaSet) {
+			if needUpdateRs.Name == rs.Name {
+				list.([]*v1.ReplicaSet)[i] = rs
+			}
+		}
+		return nil
+	}
+	return fmt.Errorf("rs-%s not found",rs.Name)
+}
+
+func(s *RsMap) Delete(rs *v1.ReplicaSet){
+	if list, ok := s.data.Load(rs.Namespace); ok {
+		for i, needDeleteRs := range list.([]*v1.ReplicaSet) {
+			if needDeleteRs.Name == rs.Name {
+				newList := append(list.([]*v1.ReplicaSet)[:i], list.([]*v1.ReplicaSet)[i+1:]...)
+				s.data.Store(rs.Namespace,newList)
+				break
+			}
+		}
+	}
+}
+// 根据ns获取 对应的rs列表
+func(s *RsMap) ListByNameSpace(ns string) ([]*v1.ReplicaSet,error){
+	if list,ok:=s.data.Load(ns);ok {
+		return list.([]*v1.ReplicaSet),nil
+	}
+	return nil,fmt.Errorf("pods not found ")
+}
+
 
 // 保存Pod集合
 type PodMap struct {

@@ -14,6 +14,8 @@ type DeploymentCtl struct {
 	K8sClient kubernetes.Interface `inject:"-"`
 	DeploymentService *services.DeploymentService  `inject:"-"`
 	DeployMap *services.DeploymentMap `inject:"-"`
+	RsMap *services.RsMap  `inject:"-"`
+	PodMap *services.PodMap `inject:"-"`
 }
 
 func NewDeploymentCtl() *DeploymentCtl {
@@ -32,6 +34,8 @@ func (d *DeploymentCtl) Build(goft *goft.Goft) {
 	goft.Handle("GET","/deployments/:ns/:name", d.LoadDeployment)
 	goft.Handle("POST","/deployments", d.SaveDeployment)
 	goft.Handle("DELETE","/deployments/:ns/:name", d.RmDeployment)
+	//根据Deployment获取PODS
+	goft.Handle("GET","/deployments-pods/:ns/:name", d.LoadDeployPods)
 }
 
 // List 获取dep列表
@@ -116,6 +120,57 @@ func(d *DeploymentCtl) initLabel(deploy *v1.Deployment) {
 	deploy.Spec.Selector.MatchLabels["kube-manager-app"] = deploy.Name
 
 	deploy.Spec.Template.ObjectMeta.Labels["kube-manager-app"] = deploy.Name
+}
+
+//加载deploymeny的pods列表
+func(d *DeploymentCtl) LoadDeployPods(c *gin.Context) goft.Json{
+	ns := c.Param("ns")
+	name := c.Param("name")
+	dep, err := d.DeployMap.GetDeployment(ns,name)// 原生
+	goft.Error(err)
+
+	labels, err := d.getLabelsByDep(dep,ns) //根据deployment过滤出 rs，然后直接获取标签
+	goft.Error(err)
+
+	podList, err := d.PodMap.ListByLabels(ns,labels)
+	goft.Error(err)
+
+
+	return gin.H{
+		"code":20000,
+		"data":podList,
+	}
+}
+
+const (
+	Deployment = "Deployment"
+)
+
+func(d *DeploymentCtl) isRsFromDep(dep *v1.Deployment,set v1.ReplicaSet) bool{
+	for _, ref := range set.OwnerReferences {
+		if ref.Kind == Deployment && ref.Name == dep.Name {
+			return true
+		}
+	}
+	return false
+}
+
+//获取deployment下的 ReplicaSet的 标签集合
+func(d *DeploymentCtl) getLabelsByDep(dep *v1.Deployment,ns string ) ([]map[string]string,error){
+	rsList,err:= d.RsMap.ListByNameSpace(ns)  // 根据namespace 取到 所有rs
+	goft.Error(err)
+
+	ret := make([]map[string]string, 0)
+	for _, item := range rsList{
+		if d.isRsFromDep(dep, *item) {
+			s,err:= v12.LabelSelectorAsMap(item.Spec.Selector)
+			if err != nil {
+				return nil,err
+			}
+			ret = append(ret,s)
+		}
+	}
+	return ret,nil
 }
 
 

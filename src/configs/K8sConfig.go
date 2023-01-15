@@ -16,6 +16,7 @@ import (
 
 type K8sConfig struct {
 	DepHandler *services.DeploymentHandler `inject:"-"`
+	RsHandler *services.RsHandler `inject:"-"`
 	PodHandler *services.PodHandler        `inject:"-"`
 	NsHandler  *services.NamespaceHandler  `inject:"-"`
 	EventHandler *services.EventHandler `inject:"-"`
@@ -89,6 +90,9 @@ func (k *K8sConfig) InitInformer() informers.SharedInformerFactory {
 
 	deploymentInformer := fact.Apps().V1().Deployments()
 	deploymentInformer.Informer().AddEventHandler(k.DepHandler)
+
+	rsInformer := fact.Apps().V1().ReplicaSets()
+	rsInformer.Informer().AddEventHandler(k.RsHandler)
 
 	podInformer := fact.Core().V1().Pods() //监听pod
 	podInformer.Informer().AddEventHandler(k.PodHandler)

@@ -17,6 +17,11 @@ func (k *K8sMaps) InitDeploymentMap() *services.DeploymentMap {
 	return &services.DeploymentMap{}
 }
 
+//初始化 ReplicaSetMap
+func(k *K8sMaps) InitRsMap() *services.RsMap{
+	return &services.RsMap{}
+}
+
 // 初始化 pod map
 func(k *K8sMaps) InitPodMap() *services.PodMap {
 	return &services.PodMap{}

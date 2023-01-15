@@ -16,6 +16,11 @@ func(k *K8sHandler) DepHandlers() *services.DeploymentHandler {
 	return &services.DeploymentHandler{}
 }
 
+// RS handler
+func(k *K8sHandler) RsHandler() *services.RsHandler{
+	return &services.RsHandler{}
+}
+
 // pod handler
 func(k *K8sHandler) PodHandlers() *services.PodHandler {
 	return &services.PodHandler{}
@@ -81,6 +86,6 @@ func(k *K8sHandler) SaHandler() *services.SaHandler{
 }
 
 // ClusterRoleHandler
-func(k *K8sHandler) ConfigClusterRoleHandler() *services.ClusterRoleHandler{
+func(k *K8sHandler) ClusterRoleHandler() *services.ClusterRoleHandler{
 	return &services.ClusterRoleHandler{}
 }
