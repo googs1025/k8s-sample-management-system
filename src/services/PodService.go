@@ -1,6 +1,9 @@
 package services
 
-import "k8s-Management-System/src/models"
+import (
+	"github.com/shenyisyn/goft-gin/goft"
+	"k8s-Management-System/src/models"
+)
 
 //@Service
 type PodService struct {
@@ -30,6 +33,9 @@ func(p *PodService) GetPodContainer(ns , podName string) []*models.ContainerMode
 func(p *PodService) ListByNamespace(namespace string) []*models.Pod {
 	podList := p.PodMap.ListByNamespace(namespace)
 	res := make([]*models.Pod, 0)
+
+	deploymentList, err := MultiClusterResourceHandler.DeploymentHandlerList[clusterName].DeploymentMap.ListDeploymentByNamespace(namespace)
+	goft.Error(err)
 
 	for _, pod := range podList {
 		res = append(res, &models.Pod{
