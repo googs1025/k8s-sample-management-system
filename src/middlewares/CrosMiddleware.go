@@ -24,12 +24,13 @@ func(*CrosMiddleware) OnRequest(c *gin.Context) error{
 	}
 
 	if method == "OPTIONS" {
-		c.Set(goft.HTTP_STATUS,http.StatusNoContent) //设置响应 httpcode
+		c.Set(goft.HTTP_STATUS, http.StatusNoContent) //设置响应 httpcode
 		panic("")
 	}
 	return nil
 
 }
+
 func(*CrosMiddleware) OnResponse(result interface{}) (interface{}, error){
 	return result,nil
 }

@@ -7,7 +7,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 )
 
-// job控制器
+// statefulset控制器
 type StatefulSetCtl struct {
 	K8sClient kubernetes.Interface `inject:"-"`
 	StatefulSetService *services.StatefulSetService  `inject:"-"`
@@ -28,6 +28,7 @@ func (s *StatefulSetCtl) Build(goft *goft.Goft) {
 	goft.Handle("GET", "/statefulsets", s.List)
 }
 
+// List 获取列表
 func (s *StatefulSetCtl) List(c *gin.Context) goft.Json {
 	namespace := c.DefaultQuery("namespace", "default") // 请求： GET /cronjobs?namespace=xxxxxxx
 

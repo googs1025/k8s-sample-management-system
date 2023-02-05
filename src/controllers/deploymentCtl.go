@@ -19,8 +19,7 @@ type DeploymentCtl struct {
 }
 
 func NewDeploymentCtl() *DeploymentCtl {
-	return &DeploymentCtl{
-	}
+	return &DeploymentCtl{}
 }
 
 // Name 实现deployment controller 框架规范
@@ -33,8 +32,8 @@ func (d *DeploymentCtl) Build(goft *goft.Goft) {
 	goft.Handle("GET", "/deployments", d.List)
 	goft.Handle("GET","/deployments/:ns/:name", d.LoadDeployment)
 	goft.Handle("POST","/deployments", d.SaveDeployment)
-	goft.Handle("DELETE","/deployments/:ns/:name", d.RmDeployment)
-	//根据Deployment获取PODS
+	goft.Handle("DELETE","/deployments/:ns/:name", d.DeleteDeployment)
+	// 根据Deployment获取PODS
 	goft.Handle("GET","/deployments-pods/:ns/:name", d.LoadDeployPods)
 }
 
@@ -50,11 +49,11 @@ func (d *DeploymentCtl) List(c *gin.Context) goft.Json {
 	//return d.DeploymentService.ListAll(namespace)
 }
 
-// LoadDeployment 拿到特定dep
+// LoadDeployment 拿到特定deployment
 func(d *DeploymentCtl) LoadDeployment(c *gin.Context) goft.Json{
 	ns := c.Param("ns")
 	name := c.Param("name")
-	dep, err := d.DeployMap.GetDeployment(ns, name)// 原生
+	dep, err := d.DeployMap.GetDeployment(ns, name)  // k8s原生的deployment对象
 	goft.Error(err)
 	return gin.H{
 		"code": 20000,
@@ -71,8 +70,9 @@ func(d *DeploymentCtl) SaveDeployment(c *gin.Context) goft.Json{
 	// debug用
 	//fmt.Println(dep.Spec.Template.ObjectMeta.Labels)
 	//fmt.Println(dep.Spec.Selector)
+
 	update := c.Query("update") //代表是更新
-	if update!=""{
+	if update != "" {
 		_, err := d.K8sClient.AppsV1().Deployments(dep.Namespace).Update(c, dep, v12.UpdateOptions{})
 		goft.Error(err)
 	} else {
@@ -86,7 +86,8 @@ func(d *DeploymentCtl) SaveDeployment(c *gin.Context) goft.Json{
 	}
 }
 
-func(d *DeploymentCtl) RmDeployment(c *gin.Context) goft.Json{
+// DeleteDeployment 删除deployment
+func(d *DeploymentCtl) DeleteDeployment(c *gin.Context) goft.Json{
 	ns := c.Param("ns")
 	name := c.Param("name")
 
@@ -98,7 +99,7 @@ func(d *DeploymentCtl) RmDeployment(c *gin.Context) goft.Json{
 	}
 }
 
-// 支持前端快捷创建时需要的初始化label
+// initLabel 支持前端快捷创建时需要的初始化label
 func(d *DeploymentCtl) initLabel(deploy *v1.Deployment) {
 	if deploy.Spec.Selector == nil {
 		deploy.Spec.Selector = &v12.LabelSelector{
@@ -107,38 +108,45 @@ func(d *DeploymentCtl) initLabel(deploy *v1.Deployment) {
 			},
 		}
 	}
+
 	if deploy.Spec.Selector.MatchLabels == nil {
 		deploy.Spec.Selector.MatchLabels = map[string]string{
 			"kube-manager-app":deploy.Name,
 		}
 	}
+
 	if deploy.Spec.Template.ObjectMeta.Labels == nil {
 		deploy.Spec.Template.ObjectMeta.Labels = map[string]string{
 			"kube-manager-app":deploy.Name,
 		}
 	}
+
 	deploy.Spec.Selector.MatchLabels["kube-manager-app"] = deploy.Name
 
 	deploy.Spec.Template.ObjectMeta.Labels["kube-manager-app"] = deploy.Name
 }
 
-//加载deploymeny的pods列表
+// LoadDeployPods 加载deployment的pods列表
 func(d *DeploymentCtl) LoadDeployPods(c *gin.Context) goft.Json{
 	ns := c.Param("ns")
 	name := c.Param("name")
-	dep, err := d.DeployMap.GetDeployment(ns,name)// 原生
+
+	// 1. 先拿到所有deployment
+	dep, err := d.DeployMap.GetDeployment(ns, name)// k8s原生 deployment对象
 	goft.Error(err)
 
-	labels, err := d.getLabelsByDep(dep,ns) //根据deployment过滤出 rs，然后直接获取标签
+	// 2. 取得deployment 过滤出 rs的标签
+	labels, err := d.getLabelsByDep(dep, ns)  // 根据deployment过滤出 rs，然后直接获取标签
 	goft.Error(err)
 
-	podList, err := d.PodMap.ListByLabels(ns,labels)
+	// 3. 过滤出pods列表
+	podList, err := d.PodMap.ListByLabels(ns, labels)
 	goft.Error(err)
 
 
 	return gin.H{
-		"code":20000,
-		"data":podList,
+		"code": 20000,
+		"data": podList,
 	}
 }
 
@@ -146,6 +154,7 @@ const (
 	Deployment = "Deployment"
 )
 
+// isRsFromDep 查看rs是否为deployment的关联对象
 func(d *DeploymentCtl) isRsFromDep(dep *v1.Deployment,set v1.ReplicaSet) bool{
 	for _, ref := range set.OwnerReferences {
 		if ref.Kind == Deployment && ref.Name == dep.Name {
@@ -155,15 +164,15 @@ func(d *DeploymentCtl) isRsFromDep(dep *v1.Deployment,set v1.ReplicaSet) bool{
 	return false
 }
 
-//获取deployment下的 ReplicaSet的 标签集合
-func(d *DeploymentCtl) getLabelsByDep(dep *v1.Deployment,ns string ) ([]map[string]string,error){
-	rsList,err:= d.RsMap.ListByNameSpace(ns)  // 根据namespace 取到 所有rs
+// getLabelsByDep 获取deployment下的 ReplicaSet的 标签集合
+func(d *DeploymentCtl) getLabelsByDep(dep *v1.Deployment, ns string ) ([]map[string]string,error){
+	rsList, err := d.RsMap.ListByNameSpace(ns)  // 根据namespace 取到 所有rs
 	goft.Error(err)
 
 	ret := make([]map[string]string, 0)
 	for _, item := range rsList{
 		if d.isRsFromDep(dep, *item) {
-			s,err:= v12.LabelSelectorAsMap(item.Spec.Selector)
+			s, err := v12.LabelSelectorAsMap(item.Spec.Selector)
 			if err != nil {
 				return nil,err
 			}

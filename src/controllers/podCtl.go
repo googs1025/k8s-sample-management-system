@@ -14,6 +14,7 @@ func NewPodCtl() *PodCtl {
 	return &PodCtl{}
 }
 
+// Containers 获取pod的特定container
 func (p *PodCtl) Containers(c *gin.Context) goft.Json {
 	namespace := c.DefaultQuery("namespace", "default")
 	podName := c.DefaultQuery("name", "")
@@ -23,6 +24,7 @@ func (p *PodCtl) Containers(c *gin.Context) goft.Json {
 	}
 }
 
+// List 获取所有pods 列表
 func(p *PodCtl) List(c *gin.Context) goft.Json{
 	namespace := c.DefaultQuery("namespace", "default")
 	return gin.H{

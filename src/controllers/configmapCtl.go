@@ -10,7 +10,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 )
 
-//@ rest controller
+// ConfigMapCtl configmap控制器
 type ConfigMapCtl struct {
 	ConfigMap *services.ConfigMap `inject:"-"`
 	ConfigService *services.ConfigMapService `inject:"-"`
@@ -25,13 +25,13 @@ func(*ConfigMapCtl)  Name() string{
 	return "ConfigMapCtl"
 }
 
-// 提交 config map
+// PostConfigmap 提交创建 configmap
 func(cm *ConfigMapCtl) PostConfigmap(c *gin.Context) goft.Json{
 	postModel := &models.PostConfigMapModel{}
 	err := c.ShouldBindJSON(postModel)
 
 	goft.Error(err)
-	_,err = cm.Client.CoreV1().ConfigMaps(postModel.NameSpace).Create(
+	_, err = cm.Client.CoreV1().ConfigMaps(postModel.NameSpace).Create(
 		c,
 		&corev1.ConfigMap{
 			ObjectMeta: v1.ObjectMeta{
@@ -49,7 +49,7 @@ func(cm *ConfigMapCtl) PostConfigmap(c *gin.Context) goft.Json{
 	}
 }
 
-// 列出config map
+// ListAll 列出configmap
 func(cm *ConfigMapCtl) ListAll(c *gin.Context) goft.Json{
 	ns := c.DefaultQuery("namespace","default")
 	return gin.H{
@@ -58,8 +58,9 @@ func(cm *ConfigMapCtl) ListAll(c *gin.Context) goft.Json{
 	}
 }
 
-// DELETE /configmaps?ns=xx&name=xx
-func(cm *ConfigMapCtl) RmCm(c *gin.Context) goft.Json{
+// DeleteConfigmap 删除configmap资源
+// DELETE /configmaps?namespace=xx&name=xx
+func(cm *ConfigMapCtl) DeleteConfigmap(c *gin.Context) goft.Json{
 	ns := c.DefaultQuery("namespace","default")
 	name := c.DefaultQuery("name","")
 	goft.Error(cm.Client.CoreV1().ConfigMaps(ns).
@@ -94,6 +95,6 @@ func(cm *ConfigMapCtl) Detail(c *gin.Context) goft.Json{
 func(cm *ConfigMapCtl)  Build(goft *goft.Goft){
 	goft.Handle("GET","/configmaps", cm.ListAll)
 	goft.Handle("GET","/configmaps/:ns/:name", cm.Detail)
-	goft.Handle("DELETE","/configmaps", cm.RmCm)
+	goft.Handle("DELETE","/configmaps", cm.DeleteConfigmap)
 	goft.Handle("POST","/configmaps", cm.PostConfigmap)
 }

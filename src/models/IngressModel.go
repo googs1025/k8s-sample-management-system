@@ -19,7 +19,7 @@ type  IngressRules struct {
 	Paths []*IngressPath `json:"paths"`
 }
 
-//提交Ingress 对象
+// 提交Ingress 对象
 type  IngressPost struct{
 	Name string
 	Namespace string

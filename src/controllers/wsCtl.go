@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/shenyisyn/goft-gin/goft"
 	"k8s-Management-System/src/helpers"
@@ -42,8 +41,9 @@ func(w *WsCtl) PodConnect(c *gin.Context) (v goft.Void) {
 	namespace := c.Query("namespace")
 	pod := c.Query("pod")
 	container := c.Query("c")
-	wsClient,err:=wscore.Upgrader.Upgrade(c.Writer,c.Request,nil)
-	if err!=nil {
+
+	wsClient, err := wscore.Upgrader.Upgrade(c.Writer,c.Request,nil)
+	if err != nil {
 		return
 	}
 	shellClient := wscore.NewWsShellClient(wsClient)
@@ -67,7 +67,7 @@ func(w *WsCtl) NodeConnect(c *gin.Context) (v goft.Void){
 	shellClient := wscore.NewWsShellClient(wsClient)
 	// session, err := helpers.SSHConnect(helpers.TempSSHUser,  helpers.TempSSHPWD, helpers.TempSSHIP ,22)
 	session, err := helpers.SSHConnect(nodeConfig.User, nodeConfig.Pass, nodeConfig.Ip ,22 )
-	fmt.Println("error:!!!!", err)
+	//fmt.Println("error:!!!!", err)
 	goft.Error(err)
 	defer session.Close()
 	session.Stdout = shellClient

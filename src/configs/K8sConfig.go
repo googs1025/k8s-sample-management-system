@@ -14,6 +14,7 @@ import (
 	"log"
 )
 
+// K8sConfig 所有资源的handler
 type K8sConfig struct {
 	DepHandler *services.DeploymentHandler `inject:"-"`
 	RsHandler *services.RsHandler `inject:"-"`
@@ -29,7 +30,7 @@ type K8sConfig struct {
 	ConfigMapHandler *services.ConfigMapHandler `inject:"-"`
 	NodeHandler *services.NodeHandler `inject:"-"`
 	RoleHandler *services.RoleHandler `inject:"-"`
-	RoleBindingHander *services.RoleBindingHander `inject:"-"`
+	RoleBindingHandler *services.RoleBindingHander `inject:"-"`
 	SaHandler *services.SaHandler `inject:"-"`
 	ClusterRoleHandler *services.ClusterRoleHandler `inject:"-"`
 }
@@ -38,7 +39,7 @@ func NewK8sConfig() *K8sConfig {
 	return &K8sConfig{}
 }
 
-//初始化 系统 配置
+// InitSysConfig 系统配置初始化
 func(*K8sConfig) InitSysConfig() *models.SysConfig{
 	b, err := ioutil.ReadFile("app.yaml")
 	if err != nil {
@@ -52,9 +53,10 @@ func(*K8sConfig) InitSysConfig() *models.SysConfig{
 	return config
 }
 
+// K8sRestConfig 默认读取项目根目录的config文件
 func(*K8sConfig) K8sRestConfig() *rest.Config{
 	config, err := clientcmd.BuildConfigFromFlags("","/Users/zhenyu.jiang/go/src/golanglearning/new_project/k8s-Management-System/config" )
-	config.Insecure = true
+	config.Insecure = true // 不使用认证的方式
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -72,9 +74,6 @@ func(k *K8sConfig) InitMetricClient() *versioned.Clientset {
 }
 
 func (k *K8sConfig) InitClient() kubernetes.Interface {
-	//config := &rest.Config{
-	//	Host: "http://1.14.120.233:8009",
-	//}
 
 	client, err := kubernetes.NewForConfig(k.K8sRestConfig())
 	if err != nil {
@@ -84,6 +83,7 @@ func (k *K8sConfig) InitClient() kubernetes.Interface {
 	return client
 }
 
+// InitInformer informer初始化
 func (k *K8sConfig) InitInformer() informers.SharedInformerFactory {
 
 	fact := informers.NewSharedInformerFactory(k.InitClient(), 0)
@@ -131,7 +131,7 @@ func (k *K8sConfig) InitInformer() informers.SharedInformerFactory {
 	RoleInformer.Informer().AddEventHandler(k.RoleHandler)
 
 	RolesBindingInformer := fact.Rbac().V1().RoleBindings()
-	RolesBindingInformer.Informer().AddEventHandler(k.RoleBindingHander)
+	RolesBindingInformer.Informer().AddEventHandler(k.RoleBindingHandler)
 
 	SaInformer := fact.Core().V1().ServiceAccounts()
 	SaInformer.Informer().AddEventHandler(k.SaHandler)

@@ -18,7 +18,7 @@ func HandleCommand(namespace, pod, container string, client *kubernetes.Clientse
 		Stderr:  true,
 		TTY:true,
 	}
-
+	// 执行pods中 特定container容器的命令
 	req := client.CoreV1().RESTClient().Post().Resource("pods").
 		Namespace(namespace).
 		Name(pod).

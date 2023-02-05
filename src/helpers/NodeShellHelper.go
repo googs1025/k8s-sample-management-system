@@ -5,11 +5,7 @@ import (
 	"golang.org/x/crypto/ssh"
 	"net"
 )
-const (
-	TempSSHUser = "root"
-	TempSSHPWD = "googs1025Aa1234567"
-	TempSSHIP = "1.14.120.233"
-)
+
 var NodeShellModes  = ssh.TerminalModes{
 	ssh.ECHO:           1,     // enable echoing
 	ssh.TTY_OP_ISPEED: 14400, // input speed = 14.4kbaud

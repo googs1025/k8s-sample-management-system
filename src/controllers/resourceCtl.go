@@ -61,6 +61,6 @@ func(*ResourcesCtl) Name() string{
 	return "Resources"
 }
 
-func(rc *ResourcesCtl)  Build(goft *goft.Goft){
+func(rc *ResourcesCtl) Build(goft *goft.Goft){
 	goft.Handle("GET","/resources", rc.ListResources)
 }

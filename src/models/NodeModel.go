@@ -25,7 +25,7 @@ func NewNodeUsage(pods int, cpu float64, memory float64) *NodeUsage {
 	return &NodeUsage{Pods: pods, Cpu: cpu, Memory: memory}
 }
 
-//容量
+// 容量
 type NodeCapacity struct {
 	Cpu int64
 	Memory int64
@@ -36,7 +36,7 @@ func NewNodeCapacity(cpu int64, memory int64, pods int64) *NodeCapacity {
 	return &NodeCapacity{Cpu: cpu, Memory: memory, Pods: pods}
 }
 
-//保存用
+// 保存用
 type PostNodeModel struct {
 	Name string
 	OriginLabels map[string]string  //原始标签 ---->前端 是一个对象

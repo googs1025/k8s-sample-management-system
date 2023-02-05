@@ -5,6 +5,7 @@ import (
 	"net/http"
 )
 
+// websocket 升级请求
 var Upgrader websocket.Upgrader
 
 func init() {

@@ -23,7 +23,7 @@ type SecretModel struct {
 	Data map[string][]byte  // KV
 }
 
-//提交 用的
+// 提交用
 type PostSecretModel struct {
 	Name string
 	NameSpace string

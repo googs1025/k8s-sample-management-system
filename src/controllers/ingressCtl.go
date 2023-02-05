@@ -25,8 +25,8 @@ func(i *IngressCtl) ListAll(c *gin.Context) goft.Json{
 	ns := c.DefaultQuery("namespace","default")
 
 	return gin.H{
-		"code":20000,
-		"data":i.IngressMap.ListAll(ns), //暂时 不分页
+		"code": 20000,
+		"data": i.IngressMap.ListAll(ns), // 不分页
 	}
 }
 
@@ -35,7 +35,7 @@ func(i *IngressCtl)  Build(goft *goft.Goft){
 	goft.Handle("POST","/ingress", i.PostIngress)
 }
 
-
+// PostIngress 创建ingress对象
 func(i *IngressCtl) PostIngress(c *gin.Context) goft.Json {
 	postModel := &models.IngressPost{}
 	goft.Error(c.BindJSON(postModel))

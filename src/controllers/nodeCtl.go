@@ -27,11 +27,11 @@ func(n *NodeCtl) ListAll(c *gin.Context) goft.Json{
 
 }
 
-// SaveNode 保存node
+// SaveNode 保存node，不支持创建，只有支持标签与污点的修改
 func(n *NodeCtl) SaveNode(c *gin.Context) goft.Json{
 	nodeModel := &models.PostNodeModel{}
 	_ = c.ShouldBindJSON(nodeModel)
-	node := n.NodeService.LoadOriginNode(nodeModel.Name) //取出原始node 信息
+	node := n.NodeService.LoadOriginNode(nodeModel.Name) // 取出原始node 信息
 	if node == nil {
 		panic("no such node")
 	}
@@ -48,6 +48,7 @@ func(n *NodeCtl) SaveNode(c *gin.Context) goft.Json{
 	}
 }
 
+// LoadDetail 获取node详细信息
 func(n *NodeCtl) LoadDetail(c *gin.Context) goft.Json{
 	nodeName := c.Param("node")
 	return gin.H{

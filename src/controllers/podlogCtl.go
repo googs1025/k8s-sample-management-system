@@ -56,7 +56,7 @@ func(pl *PodLogsCtl) GetLogs(c *gin.Context) (v goft.Void) {
 	//return
 
 	ns := c.DefaultQuery("ns","default")
-	podname := c.DefaultQuery("podname","")
+	podName := c.DefaultQuery("podname","")
 	cname := c.DefaultQuery("cname","")
 	var tailLine int64=100
 	opt := &v1.PodLogOptions{
@@ -66,11 +66,12 @@ func(pl *PodLogsCtl) GetLogs(c *gin.Context) (v goft.Void) {
 	}
 
 	cc, _ := context.WithTimeout(c, time.Minute*30) //设置半小时超时时间。否则会造成内存泄露
-	req := pl.Client.CoreV1().Pods(ns).GetLogs(podname,opt)
+	req := pl.Client.CoreV1().Pods(ns).GetLogs(podName, opt)
 	reader, err := req.Stream(cc)
-	goft.Error(err)
+  	goft.Error(err)
 	defer reader.Close()
 
+	// 分块发送的方式
 	for {
 		buf := make([]byte, 1024)
 		n, err := reader.Read(buf) // 如果 当前日志 读完了。 会阻塞
