@@ -15,7 +15,7 @@ func NewConfigMapService() *ConfigMapService {
 	return &ConfigMapService{}
 }
 
-// 前台用于显示Secret列表
+// ListConfigMapByNamespace 前台用于显示configmaps列表
 func(cms *ConfigMapService) ListConfigMapByNamespace(namespace string) []*models.ConfigMapModel {
 	list := cms.ConfigMap.ListAll(namespace)
 	ret := make([]*models.ConfigMapModel, len(list))

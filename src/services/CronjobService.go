@@ -26,7 +26,7 @@ func (*CronJobService) getCronJobLastScheduleTime(cronjob *batchv1beta1.CronJob)
 
 }
 
-
+// ListAll 用于显示cronjobs的列表
 func (cj *CronJobService) ListAll(namespace string) (res []*models.CronJob) {
 
 	cronJobList, err := cj.CronJobMap.ListCronJobByNamespace(namespace)

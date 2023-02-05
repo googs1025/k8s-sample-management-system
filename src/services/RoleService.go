@@ -16,6 +16,7 @@ func NewRoleService() *RoleService {
 	return &RoleService{}
 }
 
+// ListRoles 获取roles列表
 func(rs *RoleService) ListRoles(ns string) []*models.RoleModel {
 	list := rs.RoleMap.ListAll(ns)
 	ret := make([]*models.RoleModel,len(list))

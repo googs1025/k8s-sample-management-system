@@ -14,6 +14,7 @@ func NewServiceService() *ServiceService {
 	return &ServiceService{}
 }
 
+
 func(s *ServiceService) ListServiceByNamespace(namespace string) []*models.Service {
 	serviceList, err := s.ServiceMap.ListServiceByNamespace(namespace)
 	goft.Error(err)

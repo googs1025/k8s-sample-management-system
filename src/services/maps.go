@@ -128,7 +128,7 @@ func(s *RsMap) Delete(rs *v1.ReplicaSet){
 }
 // 根据ns获取 对应的rs列表
 func(s *RsMap) ListByNameSpace(ns string) ([]*v1.ReplicaSet,error){
-	if list,ok:=s.data.Load(ns);ok {
+	if list, ok := s.data.Load(ns); ok {
 		return list.([]*v1.ReplicaSet),nil
 	}
 	return nil,fmt.Errorf("pods not found ")
@@ -225,7 +225,7 @@ func(p *PodMap) DEBUG_ListByNS(ns string) []*corev1.Pod {
 	return ret
 }
 
-//根据节点名称 获取pods数量
+// GetNum 根据节点名称 获取pods数量
 func(p *PodMap) GetNum(nodeName string) (num int){
 	p.data.Range(func(key, value interface{}) bool {
 		list := value.([]*corev1.Pod)
@@ -284,6 +284,7 @@ type EventMap struct {
 	data sync.Map   // [key string] *v1.Event
 	// key=>namespace+"_"+kind+"_"+name 这里的name 不一定是pod ,这样确保唯一
 }
+
 func(e *EventMap) GetMessage(ns string, kind string, name string) string {
 	key := fmt.Sprintf("%s_%s_%s", ns, kind,name)
 	if v, ok := e.data.Load(key); ok {
@@ -299,7 +300,8 @@ type MapItem struct {
 	key string
 	value interface{}
 }
-//把sync.map  转为 自定义切片
+
+// 把sync.map 转为 自定义切片
 func convertToMapItems(m sync.Map) MapItems{
 	items := make(MapItems,0)
 	m.Range(func(key, value interface{}) bool {
@@ -535,7 +537,7 @@ func (s *StatefulSetMap) GetStatefulSet(namespace string, statefulSetName string
 	return nil, fmt.Errorf("get statefulSet error, not found")
 }
 
-// ServiceMap 使用informer监听资源变化后，事件变化加入map中
+// CronJobMap 使用informer监听资源变化后，事件变化加入map中
 type CronJobMap struct {
 	data sync.Map
 }
@@ -610,11 +612,12 @@ func (s *CronJobMap) GetCronJob(namespace string, cronJobName string) (*batchv1b
 type IngressMap struct {
 	data sync.Map   // [ns string] []*v1beta1.Ingress
 }
+
 //获取单个Ingress
 func(i *IngressMap) Get(namespace string,name string) *networkingv1.Ingress{
 	if items,ok := i.data.Load(namespace);ok{
 		for _, item := range items.([]*networkingv1.Ingress){
-			if item.Name==name{
+			if item.Name == name {
 				return item
 			}
 		}
@@ -672,7 +675,7 @@ func(i *IngressMap) ListAll(ns string)[]*models.IngressModel{
 	return []*models.IngressModel{} //返回空列表
 }
 
-//SecretMap
+// SecretMap
 type SecretMap struct {
 	data sync.Map   // [ns string] []*v1.Secret
 }
@@ -759,26 +762,26 @@ func(c *ConfigMap) Get(ns string,name string) *corev1.ConfigMap{
 }
 
 func(c *ConfigMap) Add(item *corev1.ConfigMap){
-	if list,ok:=c.data.Load(item.Namespace);ok{
-		list=append(list.([]*cm),newcm(item))
-		c.data.Store(item.Namespace,list)
-	}else{
-		c.data.Store(item.Namespace,[]*cm{newcm(item)})
+	if list, ok := c.data.Load(item.Namespace); ok{
+		list = append(list.([]*cm), newcm(item))
+		c.data.Store(item.Namespace, list)
+	} else {
+		c.data.Store(item.Namespace, []*cm{newcm(item)})
 	}
 }
 
 // 返回值 是true 或false . true代表有值更新了， 否则返回false
 func(c *ConfigMap) Update(item *corev1.ConfigMap) bool {
-	if list,ok:=c.data.Load(item.Namespace);ok{
+	if list, ok := c.data.Load(item.Namespace); ok {
 		for i,range_item:=range list.([]*cm){
 			//这里做判断，如果没变化就不做 更新
-			if range_item.cmdata.Name==item.Name && !helpers.CmIsEq(range_item.cmdata.Data,item.Data){
-				list.([]*cm)[i]=newcm(item)
+			if range_item.cmdata.Name == item.Name && !helpers.CmIsEq(range_item.cmdata.Data, item.Data) {
+				list.([]*cm)[i] = newcm(item)
 				return true //代表有值更新了
 			}
 		}
 	}
-	return 	  false
+	return false
 }
 
 func(c *ConfigMap) Delete(svc *corev1.ConfigMap){
@@ -798,7 +801,7 @@ func(c *ConfigMap) ListAll(ns string) []*corev1.ConfigMap {
 	if list, ok := c.data.Load(ns);ok{
 		newList := list.([]*cm)
 		for _, cm := range newList{
-			ret = append(ret,cm.cmdata)
+			ret = append(ret, cm.cmdata)
 		}
 	}
 	return ret //返回空列表

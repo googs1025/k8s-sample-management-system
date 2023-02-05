@@ -24,13 +24,13 @@ func NewIngressService() *IngressService {
 func(i *IngressService) PostIngress(post *models.IngressPost) error{
 	className := "nginx"
 	ingressRules := []v1beta1.IngressRule{}
-	// 凑 Rule对象
+	// 凑齐 Rule对象
 	for _, r := range post.Rules {
 		httpRuleValue := &v1beta1.HTTPIngressRuleValue{}
 		rulePaths := make([]v1beta1.HTTPIngressPath, 0)
 		for _, pathCfg := range r.Paths {
-			port,err:=strconv.Atoi(pathCfg.Port)
-			if err!=nil{
+			port, err := strconv.Atoi(pathCfg.Port)
+			if err != nil {
 				return err
 			}
 			rulePaths = append(rulePaths, v1beta1.HTTPIngressPath{
@@ -51,7 +51,7 @@ func(i *IngressService) PostIngress(post *models.IngressPost) error{
 		ingressRules = append(ingressRules, rule)
 	}
 
-	// 凑 Ingress对象
+	// 凑齐 Ingress对象
 	ingress := &v1beta1.Ingress{
 		TypeMeta:v1.TypeMeta{
 			Kind: "Ingress",
@@ -76,7 +76,7 @@ func(i *IngressService) PostIngress(post *models.IngressPost) error{
 }
 
 
-// 解析标签
+// parseAnnotations 解析标签
 func(i *IngressService) parseAnnotations(annos string) map[string]string{
 	replace := []string{"\t"," ","\n","\r\n"}
 	for _, r := range replace{

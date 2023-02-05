@@ -15,18 +15,22 @@ func TestPodLog(t *testing.T) {
 
 
 	// 单次查看log日志
-	//res := client.CoreV1().Pods("default").GetLogs("myredis-0", &v1.PodLogOptions{})
-	//ret := res.Do(context.Background())
-	//b, _ := ret.Raw()
-	//fmt.Println(string(b))
+	res := client.CoreV1().Pods("default").GetLogs("mycrd-controller-78b98dcd7-hls78", &v1.PodLogOptions{})
+	ret := res.Do(context.Background())
+	b, _ := ret.Raw()
+	fmt.Println(string(b))
 
 
-	// 流方式watch日志
-	res_watch := client.CoreV1().Pods("default").GetLogs("myredis-0", &v1.PodLogOptions{
+	//流方式watch日志
+	res_watch := client.CoreV1().Pods("default").GetLogs("mycrd-controller-78b98dcd7-hls78", &v1.PodLogOptions{
 		Follow: true,
 	})
 	// 流式监听
-	reader, _ := res_watch.Stream(context.Background())
+	reader, err := res_watch.Stream(context.Background())
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 	for {
 		buf := make([]byte, 1024)
 		n, err := reader.Read(buf)

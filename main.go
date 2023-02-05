@@ -5,6 +5,7 @@ import (
 	"github.com/shenyisyn/goft-gin/goft"
 	"k8s-Management-System/src/configs"
 	"k8s-Management-System/src/controllers"
+	"k8s-Management-System/src/middlewares"
 	"net/http"
 )
 
@@ -53,10 +54,11 @@ func main() {
 			controllers.NewResourcesCtl(),
 		).
 		Attach(
-			//middlewares.NewCrossMiddleware(), //跨域中间件
+			middlewares.NewCrossMiddleware(), //跨域中间件
 		)
 
 	// 前端布署静态文件。
+	// 这是一种简易的部署方式。
 	//server.Static("/dashboard", "./admin")
 	//server.Static("/static", "./admin/static")
 

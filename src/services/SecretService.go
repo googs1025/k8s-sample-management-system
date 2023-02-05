@@ -10,10 +10,12 @@ type SecretService struct {
 	Client *kubernetes.Clientset `inject:"-"`
 	SecretMap *SecretMap `inject:"-"`
 }
+
 func NewSecretService() *SecretService {
 	return &SecretService{}
 }
-// 前台用于显示Secret列表
+
+// ListSecretByNamespace 前台用于显示Secret列表
 func(s *SecretService) ListSecretByNamespace(namespace string) []*models.SecretModel {
 
 	list := s.SecretMap.ListAll(namespace)

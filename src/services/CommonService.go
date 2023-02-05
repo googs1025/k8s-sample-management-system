@@ -8,9 +8,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 )
 
-type CommonService struct {
-
-}
+type CommonService struct {}
 
 func NewCommonService() *CommonService {
 	return &CommonService{}

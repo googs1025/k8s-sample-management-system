@@ -13,6 +13,6 @@ func NewSaService() *SaService {
 
 func(ss *SaService) ListSa(ns string) []*corev1.ServiceAccount {
 	//sa:=corev1.ServiceAccount{}
-
+	// 直接使用k8s原生对象
 	return ss.SaMap.ListAll(ns)
 }

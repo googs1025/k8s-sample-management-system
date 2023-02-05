@@ -6,14 +6,14 @@ import (
 	"net/http"
 )
 
-type CrosMiddleware struct {
+type CrossMiddleware struct {
 
 }
 
-func NewCrosMiddleware() *CrosMiddleware {
-	return &CrosMiddleware{}
+func NewCrossMiddleware() *CrossMiddleware {
+	return &CrossMiddleware{}
 }
-func(*CrosMiddleware) OnRequest(c *gin.Context) error{
+func(*CrossMiddleware) OnRequest(c *gin.Context) error{
 	method := c.Request.Method
 	if method != "" {
 		c.Header("Access-Control-Allow-Origin", "*")  // 可将将 * 替换为指定的域名
@@ -31,6 +31,6 @@ func(*CrosMiddleware) OnRequest(c *gin.Context) error{
 
 }
 
-func(*CrosMiddleware) OnResponse(result interface{}) (interface{}, error){
+func(*CrossMiddleware) OnResponse(result interface{}) (interface{}, error){
 	return result,nil
 }
