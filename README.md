@@ -26,7 +26,7 @@
 ➜  k8s-Management-System git:(main) ls -a | grep config
 config
 ```
-config文件示例
+config文件示例(部分...)
 ```
 apiVersion: v1
 clusters:
@@ -34,6 +34,7 @@ clusters:
     server: https://xxxxxxxxx:6443
   name: kubernetes
 contexts:
+.......
 ```
 2. 加入远程node连接的配置文件app.yaml
 * 根目录下加入app.yaml，内容如下，分别填入节点名、ip、用户与密码
