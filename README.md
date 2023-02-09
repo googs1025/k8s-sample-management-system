@@ -21,27 +21,39 @@
 1. configmap
 2. secret
 ### 项目启动
-1. 进入自己的集群输入命令(转发端口)
-```bigquery
-[root@vm-0-12-centos ~]# kubectl proxy --address="0.0.0.0" --accept-hosts='^*$' --port=8009
-Starting to serve on [::]:8009
+1. 进入把目标集群的.kube/config文件放入项目根目录
+```
+➜  k8s-Management-System git:(main) ls -a | grep config
+config
+```
+config文件示例
+```
+apiVersion: v1
+clusters:
+- cluster:
+    server: https://xxxxxxxxx:6443
+  name: kubernetes
+contexts:
+```
+2. 加入远程node连接的配置文件app.yaml
+* 根目录下加入app.yaml，内容如下，分别填入节点名、ip、用户与密码
+```
+k8s:
+  nodes:
+    - name: xxxxxxx
+      ip: xxxxxxx
+      user: xxxxx
+      pass: xxxxxx
+    - name: xxxxxxx
+      ip: xxxxxxx
+      user: xxxxxxx
+      pass: xxxxxxx
+    - name: xxxxxxx
+      ip: xxxxxxx
+      user: xxxxxxx
+      pass: xxxxxxx
 ```
 
-2. 修改配置文件
-cd src/configs/K8sConfig.go
-```bigquery
-func (*K8sConfig) InitClient() kubernetes.Interface {
-	config := &rest.Config{
-		Host: "http://<自己的k8s集群 ip>>:8009",
-	}
-	client, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		log.Fatal(err)
-	}
-	
-	return client
-}
-```
 
 3. 启动server
 ```bigquery
