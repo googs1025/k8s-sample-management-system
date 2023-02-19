@@ -3,6 +3,7 @@ package test
 import (
 	"context"
 	"fmt"
+	"k8s-Management-System/src/common"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
@@ -12,9 +13,9 @@ import (
 
 // TestConfig 使用本地config登入远程k8s
 func TestConfig(t *testing.T) {
-
-	config, err := clientcmd.BuildConfigFromFlags("","/Users/zhenyu.jiang/go/src/golanglearning/new_project/k8s-Management-System/config")
-	if err!=nil{
+	path := common.GetWd()
+	config, err := clientcmd.BuildConfigFromFlags("", path + "/config")
+	if err != nil {
 		log.Fatal(err)
 	}
 	config.Insecure = true

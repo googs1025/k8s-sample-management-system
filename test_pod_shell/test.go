@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"k8s-Management-System/src/common"
 	"k8s-Management-System/src/helpers"
 	"k8s-Management-System/src/wscore"
 	"k8s.io/client-go/kubernetes"
@@ -12,7 +13,8 @@ import (
 
 func main() {
 	// 本地config
-	config, err := clientcmd.BuildConfigFromFlags("","/Users/zhenyu.jiang/go/src/golanglearning/new_project/k8s-Management-System/config" )
+	path := common.GetWd()
+	config, err := clientcmd.BuildConfigFromFlags("", path + "/config" )
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -29,7 +31,7 @@ func main() {
 			return
 		}
 		shellClient := wscore.NewWsShellClient(wsClient)
-		err = helpers.HandleCommand(client, config, []string{"sh"}).
+		err = helpers.HandleCommand("default","pod1", "container1", client, config, []string{"sh"}).
 			Stream(remotecommand.StreamOptions{
 				Stdin: shellClient,
 				Stdout: shellClient,

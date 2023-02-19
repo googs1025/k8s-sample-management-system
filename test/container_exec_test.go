@@ -2,6 +2,7 @@ package test
 
 import (
 	"fmt"
+	"k8s-Management-System/src/common"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/scheme"
@@ -15,7 +16,8 @@ import (
 // 本地执行远端pod的容器命令
 func TestContainerExec(t *testing.T) {
 	// 使用本地的config
-	config, err := clientcmd.BuildConfigFromFlags("","/Users/zhenyu.jiang/go/src/golanglearning/new_project/k8s-Management-System/config" )
+	path := common.GetWd()
+	config, err := clientcmd.BuildConfigFromFlags("", path + "/config" )
 	if err!=nil{
 		log.Fatal(err)
 	}

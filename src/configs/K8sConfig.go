@@ -3,6 +3,7 @@ package configs
 import (
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
+	"k8s-Management-System/src/common"
 	"k8s-Management-System/src/models"
 	"k8s-Management-System/src/services"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -55,7 +56,8 @@ func(*K8sConfig) InitSysConfig() *models.SysConfig{
 
 // K8sRestConfig 默认读取项目根目录的config文件
 func(*K8sConfig) K8sRestConfig() *rest.Config{
-	config, err := clientcmd.BuildConfigFromFlags("","/Users/zhenyu.jiang/go/src/golanglearning/new_project/k8s-Management-System/config" )
+	path := common.GetWd()
+	config, err := clientcmd.BuildConfigFromFlags("", path + "/config" )
 	config.Insecure = true // 不使用认证的方式
 	if err != nil {
 		log.Fatal(err)
